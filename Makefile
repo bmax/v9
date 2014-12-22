@@ -6,26 +6,26 @@ LEX = flex
 
 # Link the object files together into the final executable.
 
-tube4: tube4-lexer.o tube4-parser.tab.o ast.o ic.o type_info.o
-	$(GCC) tube4-parser.tab.o tube4-lexer.o ast.o ic.o type_info.o -o tube4 -ll -ly
+v9: v9-lexer.o v9-parser.tab.o ast.o ic.o type_info.o
+	$(GCC) v9-parser.tab.o v9-lexer.o ast.o ic.o type_info.o -o v9 -ll -ly
 
 
 # Use the lex and yacc templates to build the C++ code files.
 
-tube4-lexer.o: tube4-lexer.cc tube4.lex symbol_table.h
-	$(GCC) $(CFLAGS) -c tube4-lexer.cc
+v9-lexer.o: v9-lexer.cc v9.lex symbol_table.h
+	$(GCC) $(CFLAGS) -c v9-lexer.cc
 
-tube4-parser.tab.o: tube4-parser.tab.cc tube4.y symbol_table.h
-	$(GCC) $(CFLAGS) -c tube4-parser.tab.cc
+v9-parser.tab.o: v9-parser.tab.cc v9.y symbol_table.h
+	$(GCC) $(CFLAGS) -c v9-parser.tab.cc
 
 
 # Compile the individual code files into object files.
 
-tube4-lexer.cc: tube4.lex tube4-parser.tab.cc symbol_table.h
-	$(LEX) -otube4-lexer.cc tube4.lex
+v9-lexer.cc: v9.lex v9-parser.tab.cc symbol_table.h
+	$(LEX) -ov9-lexer.cc v9.lex
 
-tube4-parser.tab.cc: tube4.y symbol_table.h
-	$(YACC) -o tube4-parser.tab.cc -d tube4.y
+v9-parser.tab.cc: v9.y symbol_table.h
+	$(YACC) -o v9-parser.tab.cc -d v9.y
 
 ast.o: ast.cc ast.h symbol_table.h
 	$(GCC) $(CFLAGS) -c ast.cc
@@ -40,4 +40,4 @@ type_info.o: type_info.h type_info.cc
 # Cleanup all auto-generated files
 
 clean:
-	rm -f tube4 *.o tube4-lexer.cc *.tab.cc *.tab.hh *~
+	rm -f v9 *.o v9-lexer.cc *.tab.cc *.tab.hh *~
