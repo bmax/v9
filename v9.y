@@ -197,7 +197,7 @@ expression:  expression '+' expression {
                $$->SetLineNum(line_num);
              }
 	|    '!' expression %prec UMINUS {
-               $$ = new ASTNode_Math1($2, '!');
+               $$ = new ASTNode_Bool1($2, '!');
                $$->SetLineNum(line_num);
              }
 	|    '(' expression ')' { $$ = $2; } // Ignore parens; used for order

@@ -132,6 +132,16 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+class ASTNode_Bool1 : public ASTNode {
+protected:
+  int bool_op;
+public:
+  ASTNode_Bool1(ASTNode * in, int op);
+  virtual ~ASTNode_Bool1() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 class ASTNode_Bool2 : public ASTNode {
 protected:
   int bool_op;

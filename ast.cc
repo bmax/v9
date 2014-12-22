@@ -108,9 +108,6 @@ tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
     case '-':
       out_var->SetFloatValue(-in->GetFloatValue());
       break;
-    case '!':
-      out_var->SetFloatValue(!in->GetFloatValue());
-      break;
   }
 
   if (in->GetTemp() == true) table.RemoveEntry( in );
@@ -163,10 +160,36 @@ ASTNode_BoolCast::ASTNode_BoolCast(ASTNode * in)
 tableEntry * ASTNode_BoolCast::Interpret(symbolTable & table)
 {
   tableEntry * in_var = GetChild(0)->Interpret(table);
+  if(in_var->GetType() == Type::BOOL) {
+    return in_var;
+  }
+
   tableEntry * out_var = table.AddTempEntry(Type::BOOL);
 
   if(in_var->GetType() == Type::NUM) {
     out_var->SetBoolValue(in_var->GetFloatValue() != 0);
+  }
+
+  return out_var;
+}
+
+ASTNode_Bool1::ASTNode_Bool1(ASTNode * in, int op)
+  : ASTNode(Type::BOOL), bool_op(op)
+{
+  children.push_back(in);
+}
+
+
+tableEntry * ASTNode_Bool1::Interpret(symbolTable & table)
+{
+  ASTNode_BoolCast * cast = new ASTNode_BoolCast(GetChild(0));
+  tableEntry * in_var = cast->Interpret(table);
+  tableEntry * out_var = table.AddTempEntry(Type::BOOL);
+
+  switch(bool_op) {
+    case '!':
+      out_var->SetBoolValue(!in_var->GetBoolValue());
+      break;
   }
 
   return out_var;
