@@ -284,16 +284,20 @@ ASTNode_While::ASTNode_While(ASTNode * in1, ASTNode * in2)
 {
   children.push_back(in1);
   children.push_back(in2);
-
-  if (in1->GetType() != Type::NUM) {
-    yyerror("condition for while statements must evaluate to type int");
-    exit(1);
-  }
 }
 
 
 tableEntry * ASTNode_While::Interpret(symbolTable & table)
 {
+  ASTNode_BoolCast * cast = new ASTNode_BoolCast(GetChild(0));
+
+  while(cast->Interpret(table)->GetBoolValue()) {
+    if (GetChild(1)) {
+      tableEntry * in1 = GetChild(1)->Interpret(table);
+      if (in1 && in1->GetTemp() == true) table.RemoveEntry( in1 );
+    }
+  }
+
   return NULL;
 }
 
