@@ -56,10 +56,8 @@ void yyerror2(std::string err_string, int orig_line) {
 %%
 
 program:      statement_list {
-                 IC_Array ic_array;                             // Array to contain the intermediate code
-                 $1->CompileTubeIC(symbol_table, ic_array);     // Traverse AST, filling ic_array with code
-                 std::ofstream out_file(out_filename.c_str());  // Open the output file
-                 ic_array.PrintIC(out_file);                    // Write IC to output file!
+                 // Traverse AST
+                 $1->Interpret(symbol_table);
               }
 	     ;
 
@@ -290,8 +288,6 @@ int main(int argc, char * argv[])
   LexMain(argc, argv);
 
   yyparse();
-
-  if (error_count == 0) std::cout << "Parse Successful!" << std::endl;
 
   return 0;
 }

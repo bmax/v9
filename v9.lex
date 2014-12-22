@@ -10,7 +10,6 @@
 
 // Two global variables (not clean, but works...)
 int line_num = 1;
-std::string out_filename = "";
 %}
 
 %option nounput
@@ -89,7 +88,6 @@ void LexMain(int argc, char * argv[])
       exit(1);
     }
 
-    // Assume the current argument is a filename (first input, then output)
     if (!input_found) {
       file = fopen(argv[arg_id], "r");
       if (!file) {
@@ -99,20 +97,12 @@ void LexMain(int argc, char * argv[])
       yyin = file;
       input_found = true;
       continue;
-    } else if (out_filename == "") {
-      out_filename = cur_arg;
     }
 
-    // Both files already loaded!
-    else {
-      std::cout << "ERROR: Unknown argument '" << cur_arg << "'" << std::endl;
-      exit(1);
-    }
   }
 
-  // Make sure we've loaded input and output filenames before we finish...
-  if (input_found == false || out_filename == "") {
-    std::cerr << "Format: " << argv[0] << "[flags] [input filename] [output filename]" << std::endl;
+  if (input_found == false) {
+    std::cerr << "Format: " << argv[0] << " [flags] [input filename]" << std::endl;
     std::cerr << "Type '" << argv[0] << " -h' for help." << std::endl;
     exit(1);
   }

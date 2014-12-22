@@ -6,8 +6,8 @@ LEX = flex
 
 # Link the object files together into the final executable.
 
-v9: v9-lexer.o v9-parser.tab.o ast.o ic.o type_info.o
-	$(GCC) v9-parser.tab.o v9-lexer.o ast.o ic.o type_info.o -o v9 -ll -ly
+v9: v9-lexer.o v9-parser.tab.o ast.o type_info.o
+	$(GCC) v9-parser.tab.o v9-lexer.o ast.o type_info.o -o v9 -ll -ly
 
 
 # Use the lex and yacc templates to build the C++ code files.
@@ -29,9 +29,6 @@ v9-parser.tab.cc: v9.y symbol_table.h
 
 ast.o: ast.cc ast.h symbol_table.h
 	$(GCC) $(CFLAGS) -c ast.cc
-
-ic.o: ic.cc ic.h symbol_table.h
-	$(GCC) $(CFLAGS) -c ic.cc
 
 type_info.o: type_info.h type_info.cc
 	$(GCC) $(CFLAGS) -c type_info.cc

@@ -26,7 +26,6 @@
 #include <vector>
 #include <fstream>
 
-#include "ic.h"
 #include "type_info.h"
 #include "symbol_table.h"
 
@@ -53,9 +52,9 @@ public:
   void AddChild(ASTNode * in_child) { children.push_back(in_child); }
   void TransferChildren(ASTNode * in_node);
 
-  // Convert a single node to TubeIC and return information about the
+  // Interpret a single node and return information about the
   // variable where the results are saved.  Call children recursively.
-  virtual tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica) = 0;
+  virtual tableEntry * Interpret(symbolTable & table) = 0;
 };
 
 
@@ -64,14 +63,14 @@ class ASTNode_TempNode : public ASTNode {
 public:
   ASTNode_TempNode(int in_type) : ASTNode(in_type) { ; }
   ~ASTNode_TempNode() { ; }
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica) { return NULL; }
+  tableEntry * Interpret(symbolTable & table) { return NULL; }
 };
 
 // Block...
 class ASTNode_Block : public ASTNode {
 public:
   ASTNode_Block() : ASTNode(Type::VOID) { ; }
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 // Leaves...
@@ -83,7 +82,7 @@ public:
     : ASTNode(in_entry->GetType()), var_entry(in_entry) {;}
 
   tableEntry * GetVarEntry() { return var_entry; }
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 class ASTNode_Literal : public ASTNode {
@@ -91,7 +90,7 @@ private:
   std::string lexeme;     // When we print, how should this node look?
 public:
   ASTNode_Literal(int in_type, std::string in_lex);
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 // Math...
@@ -101,7 +100,7 @@ public:
   ASTNode_Assign(ASTNode * lhs, ASTNode * rhs);
   ~ASTNode_Assign() { ; }
 
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 class ASTNode_Math1 : public ASTNode {
@@ -111,7 +110,7 @@ public:
   ASTNode_Math1(ASTNode * in_child, int op);
   virtual ~ASTNode_Math1() { ; }
 
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 class ASTNode_Math2 : public ASTNode {
@@ -121,7 +120,7 @@ public:
   ASTNode_Math2(ASTNode * in1, ASTNode * in2, int op);
   virtual ~ASTNode_Math2() { ; }
 
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 class ASTNode_Bool2 : public ASTNode {
@@ -131,7 +130,7 @@ public:
   ASTNode_Bool2(ASTNode * in1, ASTNode * in2, int op);
   virtual ~ASTNode_Bool2() { ; }
 
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 class ASTNode_If : public ASTNode {
@@ -139,7 +138,7 @@ public:
   ASTNode_If(ASTNode * in1, ASTNode * in2, ASTNode * in3);
   virtual ~ASTNode_If() { ; }
 
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 class ASTNode_While : public ASTNode {
@@ -147,7 +146,7 @@ public:
   ASTNode_While(ASTNode * in1, ASTNode * in2);
   virtual ~ASTNode_While() { ; }
 
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 class ASTNode_Break : public ASTNode {
@@ -155,7 +154,7 @@ public:
   ASTNode_Break();
   virtual ~ASTNode_Break() { ; }
 
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 class ASTNode_Print : public ASTNode {
@@ -163,7 +162,7 @@ public:
   ASTNode_Print(ASTNode * out_child);
   virtual ~ASTNode_Print() {;}
 
-  tableEntry * CompileTubeIC(symbolTable & table, IC_Array & ica);
+  tableEntry * Interpret(symbolTable & table);
 };
 
 
