@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cmath>
 
 #include "type_info.h"
 #include "symbol_table.h"

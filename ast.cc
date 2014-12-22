@@ -94,19 +94,26 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
 ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op)
   : ASTNode(Type::INT), math_op(op)
 {
-  if (in_child->GetType() != Type::INT) {
-    std::string err_message = "cannot use type '";
-    err_message += Type::AsString(in_child->GetType());
-    err_message += "' in mathematical expressions";
-    yyerror(err_message);
-    exit(1);
-  }
   children.push_back(in_child);
 }
 
 tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
 {
-  return NULL;
+  tableEntry * in = GetChild(0)->Interpret(table);
+  tableEntry * out_var = table.AddTempEntry(Type::INT);
+
+  switch (math_op) {
+    case '-':
+      out_var->SetFloatValue(-in->GetFloatValue());
+      break;
+    case '!':
+      out_var->SetFloatValue(!in->GetFloatValue());
+      break;
+  }
+
+  if (in->GetTemp() == true) table.RemoveEntry( in );
+
+  return out_var;
 }
 
 
@@ -116,28 +123,6 @@ tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
 ASTNode_Math2::ASTNode_Math2(ASTNode * in1, ASTNode * in2, int op)
   : ASTNode(Type::INT), math_op(op)
 {
-  bool rel_op = (op==COMP_EQU) || (op==COMP_NEQU) || (op==COMP_LESS) || (op==COMP_LTE) ||
-    (op==COMP_GTR) || (op==COMP_GTE);
-
-  ASTNode * in_test = (in1->GetType() != Type::INT) ? in1 : in2;
-  if (in_test->GetType() != Type::INT) {
-    if (!rel_op || in_test->GetType() != Type::CHAR) {
-      std::string err_message = "cannot use type '";
-      err_message += Type::AsString(in_test->GetType());
-      err_message += "' in mathematical expressions";
-      yyerror(err_message);
-      exit(1);
-    } else if (rel_op && (in1->GetType() != Type::CHAR || in2->GetType() != Type::CHAR)) {
-      std::string err_message = "types do not match for relationship operator (lhs='";
-      err_message += Type::AsString(in1->GetType());
-      err_message += "', rhs='";
-      err_message += Type::AsString(in2->GetType());
-      err_message += "')";
-      yyerror(err_message);
-      exit(1);
-    }
-  }
-
   children.push_back(in1);
   children.push_back(in2);
 }
@@ -145,7 +130,24 @@ ASTNode_Math2::ASTNode_Math2(ASTNode * in1, ASTNode * in2, int op)
 
 tableEntry * ASTNode_Math2::Interpret(symbolTable & table)
 {
-  return NULL;
+  tableEntry * in1 = GetChild(0)->Interpret(table);
+  tableEntry * in2 = GetChild(1)->Interpret(table);
+  tableEntry * out_var;
+
+  if(in1->GetType() == Type::INT && in2->GetType() == Type::INT) {
+    out_var = table.AddTempEntry(Type::INT);
+    float in1_val = in1->GetFloatValue();
+    float in2_val = in2->GetFloatValue();
+
+    if (math_op == '+') { out_var->SetFloatValue(in1_val + in2_val); }
+    else if (math_op == '+') { out_var->SetFloatValue(in1_val + in2_val); }
+    else if (math_op == '-') { out_var->SetFloatValue(in1_val - in2_val); }
+    else if (math_op == '*') { out_var->SetFloatValue(in1_val * in2_val); }
+    else if (math_op == '/') { out_var->SetFloatValue(in1_val / in2_val); }
+    else if (math_op == '%') { out_var->SetFloatValue(fmod(in1_val, in2_val)); }
+  }
+
+  return out_var;
 }
 
 
