@@ -5,8 +5,7 @@
 //
 // This file contains all of the information about the symbol table.
 //
-// symbolTable : interacted with by the rest of the code to look up information about variables,
-//               labels, and (eventually) functions.
+// symbolTable : interacted with by the rest of the code to look up information about variables
 //
 // tableEntry : all of the stored information about a single variable.
 //
@@ -29,15 +28,18 @@ protected:
   std::string name;  // Variable name used by sourcecode.
   int scope;         // What scope was this variable declared at?
   bool is_temp;      // Is this variable just temporary (internal to compiler)
-  int var_id;        // What is the intermediate code ID for this variable?
   tableEntry * next; // A pointer to another variable that this one is shadowing
 
-  tableEntry(int in_type) 
+  union {
+    float f;
+    bool b;
+  };
+
+  tableEntry(int in_type)
     : type_id (in_type)
     , name("__TEMP__")
     , scope(-1)
     , is_temp(true)
-    , var_id(-1)
     , next(NULL)
   {
   }
@@ -47,7 +49,6 @@ protected:
     , name(in_name)
     , scope(-1)
     , is_temp(false)
-    , var_id(-1)
     , next(NULL)
   {
   }
@@ -58,13 +59,15 @@ public:
   std::string GetName()  const { return name; }
   int GetScope()         const { return scope; }
   bool GetTemp()         const { return is_temp; }
-  int GetVarID()         const { return var_id; }
   tableEntry * GetNext() const { return next; }
+  float GetFloatValue()  const { return f; }
+  bool GetBoolValue()    const { return b; }
 
   void SetName(std::string in_name) { name = in_name; }
   void SetScope(int in_scope) { scope = in_scope; }
-  void SetVarID(int in_id) { var_id = in_id; }
   void SetNext(tableEntry * in_next) { next = in_next; }
+  void SetFloatValue(float f) { this->f = f; }
+  void SetBoolValue(bool f) { this->b = b; }
 };
 
 
@@ -75,14 +78,9 @@ private:
   std::vector<std::vector<tableEntry *> *> scope_info;  // Variables declared in each scope
   std::vector<tableEntry *> var_archive;                // Variables that are out of scope
   int cur_scope;                                        // Current scope level
-  int next_var_id;                                      // Next variable ID to use.
-  int next_label_id;                                    // Next label ID to use.
-  std::vector<std::string> while_end_stack;             // End labels of active while commands
 
-  // Figure out the next memory position to use.  Ideally, we should be recycling these!!
-  int GetNextID() { return next_var_id++; }
 public:
-  symbolTable() : cur_scope(0), next_var_id(0), next_label_id(0) { 
+  symbolTable() : cur_scope(0) { 
     scope_info.push_back(new std::vector<tableEntry *>);
   }
   ~symbolTable() {
@@ -130,18 +128,6 @@ public:
     cur_scope--;
   }
 
-  int NextLabelID() { return next_label_id++; }
-  std::string NextLabelID(std::string prefix) {
-    std::stringstream sstm;
-    sstm << prefix << next_label_id++;
-    return sstm.str();
-  }
-
-  int GetWhileDepth() { return (int) while_end_stack.size(); }
-  void PushWhileEndLabel(const std::string & end_label) { while_end_stack.push_back(end_label); }
-  const std::string & GetWhileEndLabel() { return while_end_stack.back(); }
-  void PopWhileEndLabel() { while_end_stack.pop_back(); }
-      
   // Lookup will find an entry and return it.  If that entry is not in the table, it will return NULL
   tableEntry * Lookup(std::string in_name) {
     if (tbl_map.find(in_name) == tbl_map.end()) return NULL;
@@ -158,8 +144,6 @@ public:
   tableEntry * AddEntry(int in_type, std::string in_name) {
     // Create the new entry for this variable.
     tableEntry * new_entry = new tableEntry(in_type, in_name);
-    new_entry->SetVarID( GetNextID() );
-    new_entry->SetScope(cur_scope);
 
     // If an old entry exists by this name, shadow it.
     tableEntry * old_entry = Lookup(in_name);
@@ -174,12 +158,9 @@ public:
   // Insert a temp variable entry into the symbol table.
   tableEntry * AddTempEntry(int in_type) {
     tableEntry * new_entry = new tableEntry(in_type);
-    new_entry->SetVarID( GetNextID() );
     return new_entry;
   }
 
-  // Don't create a full variable; just get an unused variable ID.
-  int GetTempVarID() { return GetNextID(); }
   void FreeTempVarID(int id) { (void) id; /* Nothing for now... */ }
 
   void RemoveEntry(tableEntry * del_var) {
