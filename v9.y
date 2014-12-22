@@ -238,7 +238,7 @@ command:   CONSOLE '.' LOG '(' argument_list ')' {
 	;
 
 if_start:  COMMAND_IF '(' expression ')' {
-             $$ = new ASTNode_If($3, NULL, NULL);
+             $$ = new ASTNode_If(new ASTNode_BoolCast($3), NULL, NULL);
              $$->SetLineNum(line_num);
            }
         ;

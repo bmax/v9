@@ -212,6 +212,19 @@ ASTNode_If::ASTNode_If(ASTNode * in1, ASTNode * in2, ASTNode * in3)
 
 tableEntry * ASTNode_If::Interpret(symbolTable & table)
 {
+  tableEntry * in0 = GetChild(0)->Interpret(table);
+  if(in0->GetBoolValue()) {
+    if (GetChild(1)) {
+      tableEntry * in1 = GetChild(1)->Interpret(table);
+      if (in1 && in1->GetTemp() == true) table.RemoveEntry( in1 );
+    }
+  }
+  else {
+    if (GetChild(2)) {
+      tableEntry * in2 = GetChild(2)->Interpret(table);
+      if (in2 && in2->GetTemp() == true) table.RemoveEntry( in2 );
+    }
+  }
   return NULL;
 }
 
