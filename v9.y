@@ -161,11 +161,11 @@ expression:  expression '+' expression {
                $$->SetLineNum(line_num);
              }
 	|    expression BOOL_AND expression {
-               $$ = new ASTNode_Bool2($1, $3, '&');
+               $$ = new ASTNode_Bool2($1, $3, BOOL_AND);
                $$->SetLineNum(line_num);
              }
 	|    expression BOOL_OR expression {
-               $$ = new ASTNode_Bool2($1, $3, '|');
+               $$ = new ASTNode_Bool2($1, $3, BOOL_OR);
                $$->SetLineNum(line_num);
              }
 	|    lhs_ok '=' expression {

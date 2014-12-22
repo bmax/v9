@@ -201,15 +201,6 @@ tableEntry * ASTNode_Bool1::Interpret(symbolTable & table)
 ASTNode_Bool2::ASTNode_Bool2(ASTNode * in1, ASTNode * in2, int op)
   : ASTNode(Type::NUM), bool_op(op)
 {
-  ASTNode * in_test = (in1->GetType() != Type::NUM) ? in1 : in2;
-  if (in_test->GetType() != Type::NUM) {
-    std::string err_message = "cannot use type '";
-    err_message += Type::AsString(in_test->GetType());
-    err_message += "' in mathematical expressions";
-    yyerror(err_message);
-    exit(1);
-  }
-
   children.push_back(in1);
   children.push_back(in2);
 }
@@ -217,7 +208,40 @@ ASTNode_Bool2::ASTNode_Bool2(ASTNode * in1, ASTNode * in2, int op)
 
 tableEntry * ASTNode_Bool2::Interpret(symbolTable & table)
 {
-  return NULL;
+  ASTNode_BoolCast * cast1 = new ASTNode_BoolCast(GetChild(0));
+  tableEntry * in1 = cast1->Interpret(table);
+  tableEntry * out_var = table.AddTempEntry(Type::BOOL);
+
+  out_var->SetBoolValue(in1->GetBoolValue());
+
+  // Determine the correct operation for short-circuiting
+  if (bool_op == BOOL_AND) {
+    if(!out_var->GetBoolValue()) {
+      return out_var;
+    }
+  }
+  else if (bool_op == BOOL_OR) {
+    if(out_var->GetBoolValue()) {
+      return out_var;
+    }
+  }
+
+  // Only reach here if we don't short circuit
+  ASTNode_BoolCast * cast2 = new ASTNode_BoolCast(GetChild(1));
+  tableEntry * in2 = cast2->Interpret(table);
+
+  if (bool_op == BOOL_AND) {
+    out_var->SetBoolValue(in1->GetBoolValue() && in2->GetBoolValue());
+  }
+  else if (bool_op == BOOL_OR) {
+    out_var->SetBoolValue(in1->GetBoolValue() || in2->GetBoolValue());
+  }
+
+  // Cleanup symbol table.
+  if (in1->GetTemp() == true) table.RemoveEntry( in1 );
+  if (in2->GetTemp() == true) table.RemoveEntry( in2 );
+
+  return out_var;
 }
 
 
