@@ -10,8 +10,7 @@
 
 extern int line_num;
 extern int yylex();
-extern std::string out_filename;
- 
+
 symbolTable symbol_table;
 int error_count = 0;
 
@@ -36,8 +35,8 @@ void yyerror2(std::string err_string, int orig_line) {
   ASTNode * ast_node;
 }
 
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR COMMAND_PRINT COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
-%token <lexeme> INT_LIT CHAR_LIT ID TYPE
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR CONSOLE LOG COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
+%token <lexeme> INT_LIT CHAR_LIT ID VAR
 
 %right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
 %left BOOL_OR
@@ -79,7 +78,7 @@ statement:   var_declare ';'    {  $$ = $1;  }
         |    ';'                {  $$ = NULL;  }
 	;
 
-var_declare:	TYPE ID {
+var_declare:	VAR ID {
 	          if (symbol_table.InCurScope($2) != 0) {
 		    std::string err_string = "redeclaration of variable '";
 		    err_string += $2;
@@ -87,18 +86,8 @@ var_declare:	TYPE ID {
                     yyerror(err_string);
 		    exit(1);
                   }
-		  std::string type_name = $1;
-		  int type_id = 0;
-		  if (type_name == "int") type_id = Type::INT;
-		  else if (type_name == "char") type_id = Type::CHAR;
-		  else {
-		    std::string err_string = "unknown type '";
-		    err_string += $1;
-                    err_string += "'";
-		    yyerror(err_string);
-		  }
-	          tableEntry * cur_entry = symbol_table.AddEntry(type_id, $2);
 
+	          tableEntry * cur_entry = symbol_table.AddEntry(0, $2);
 	          $$ = new ASTNode_Variable(cur_entry);
                   $$->SetLineNum(line_num);
 	        }
@@ -236,11 +225,11 @@ argument_list:	argument_list ',' expression {
 		}
 	;
 
-command:   COMMAND_PRINT argument_list {
+command:   CONSOLE '.' LOG '(' argument_list ')' {
 	     $$ = new ASTNode_Print(NULL);
-	     $$->TransferChildren($2);
+	     $$->TransferChildren($5);
              $$->SetLineNum(line_num);
-	     delete $2;
+	     delete $5;
            }
         |  COMMAND_BREAK {
              $$ = new ASTNode_Break();

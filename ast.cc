@@ -25,6 +25,13 @@ void ASTNode::TransferChildren(ASTNode * from_node)
 
 tableEntry * ASTNode_Block::Interpret(symbolTable & table)
 {
+  for (int i = 0; i < GetNumChildren(); i++) {
+    tableEntry * current = GetChild(i)->Interpret(table);
+    if (current != NULL && current->GetTemp() == true) {
+      table.RemoveEntry( current );
+    }
+  }
+
   return NULL;
 }
 
@@ -44,11 +51,15 @@ tableEntry * ASTNode_Variable::Interpret(symbolTable & table)
 ASTNode_Literal::ASTNode_Literal(int in_type, std::string in_lex)
   : ASTNode(in_type), lexeme(in_lex)
 {
-}  
+}
 
 tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
 {
-  return NULL;
+  tableEntry * out_var = table.AddTempEntry(GetType());
+  if(GetType() == Type::INT) {
+    out_var->SetFloatValue(atof(lexeme.c_str()));
+  }
+  return out_var;
 }
 
 
@@ -57,22 +68,22 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
 
 ASTNode_Assign::ASTNode_Assign(ASTNode * lhs, ASTNode * rhs)
   : ASTNode(lhs->GetType())
-{ 
-  if (lhs->GetType() != rhs->GetType()) {
-    std::string err_message = "types do not match for assignment (lhs='";
-    err_message += Type::AsString(lhs->GetType());
-    err_message += "', rhs='";
-    err_message += Type::AsString(rhs->GetType());
-    err_message += "')";
-    yyerror(err_message);
-    exit(1);
-  }
+{
   children.push_back(lhs);
   children.push_back(rhs);
 }
 
 tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
 {
+  tableEntry * left = GetChild(0)->Interpret(table);
+  tableEntry * right = GetChild(1)->Interpret(table);
+
+  left->SetType(right->GetType());
+
+  if(left->GetType() == Type::INT) {
+    left->SetFloatValue(right->GetFloatValue());
+  }
+
   return NULL;
 }
 
@@ -237,5 +248,16 @@ ASTNode_Print::ASTNode_Print(ASTNode * out_child)
 
 tableEntry * ASTNode_Print::Interpret(symbolTable & table)
 {
+  for (int i = 0; i < GetNumChildren(); i++) {
+    tableEntry * cur_var = GetChild(i)->Interpret(table);
+    switch (cur_var->GetType()) {
+      case Type::INT:
+        std::cout << cur_var->GetFloatValue();
+        break;
+    }
+  }
+
+  std::cout << std::endl;
+
   return NULL;
 }

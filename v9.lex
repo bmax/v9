@@ -14,7 +14,6 @@ int line_num = 1;
 
 %option nounput
 
-type		int|char
 id	        [_a-zA-Z][a-zA-Z0-9_]*
 int_lit         [0-9]+
 char_lit        '(.|(\\[\\'nt]))'
@@ -24,13 +23,14 @@ passthrough	[+\-*/%=(),!{}[\].;]
 
 %%
 
-"print" { return COMMAND_PRINT; }
-"if"    { return COMMAND_IF; }
-"else"  { return COMMAND_ELSE; }
-"while" { return COMMAND_WHILE; }
-"break" { return COMMAND_BREAK; }
+"if"      { return COMMAND_IF; }
+"else"    { return COMMAND_ELSE; }
+"while"   { return COMMAND_WHILE; }
+"break"   { return COMMAND_BREAK; }
+"console" { return CONSOLE; }
+"log"     { return LOG; }
 
-{type}        { yylval.lexeme = strdup(yytext);  return TYPE; }
+"var"         { yylval.lexeme = strdup(yytext);  return VAR; }
 {id}          { yylval.lexeme = strdup(yytext);  return ID; }
 {int_lit}     { yylval.lexeme = strdup(yytext);  return INT_LIT; }
 {char_lit}    { yylval.lexeme = strdup(yytext);  return CHAR_LIT; }

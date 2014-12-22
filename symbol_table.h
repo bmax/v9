@@ -63,6 +63,7 @@ public:
   float GetFloatValue()  const { return f; }
   bool GetBoolValue()    const { return b; }
 
+  void SetType(int type) { type_id = type; }
   void SetName(std::string in_name) { name = in_name; }
   void SetScope(int in_scope) { scope = in_scope; }
   void SetNext(tableEntry * in_next) { next = in_next; }
