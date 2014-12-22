@@ -56,7 +56,7 @@ ASTNode_Literal::ASTNode_Literal(int in_type, std::string in_lex)
 tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
 {
   tableEntry * out_var = table.AddTempEntry(GetType());
-  if(GetType() == Type::INT) {
+  if(GetType() == Type::NUM) {
     out_var->SetFloatValue(atof(lexeme.c_str()));
   }
   return out_var;
@@ -80,10 +80,12 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
 
   left->SetType(right->GetType());
 
-  if(left->GetType() == Type::INT) {
+  if(left->GetType() == Type::NUM) {
     left->SetFloatValue(right->GetFloatValue());
   }
-
+  else if(left->GetType() == Type::BOOL) {
+    left->SetBoolValue(right->GetBoolValue());
+  }
   return NULL;
 }
 
@@ -92,7 +94,7 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
 // ASTNode_Math1
 
 ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op)
-  : ASTNode(Type::INT), math_op(op)
+  : ASTNode(Type::NUM), math_op(op)
 {
   children.push_back(in_child);
 }
@@ -100,7 +102,7 @@ ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op)
 tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
 {
   tableEntry * in = GetChild(0)->Interpret(table);
-  tableEntry * out_var = table.AddTempEntry(Type::INT);
+  tableEntry * out_var = table.AddTempEntry(Type::NUM);
 
   switch (math_op) {
     case '-':
@@ -121,7 +123,7 @@ tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
 // ASTNode_Math2
 
 ASTNode_Math2::ASTNode_Math2(ASTNode * in1, ASTNode * in2, int op)
-  : ASTNode(Type::INT), math_op(op)
+  : ASTNode(Type::NUM), math_op(op)
 {
   children.push_back(in1);
   children.push_back(in2);
@@ -134,8 +136,8 @@ tableEntry * ASTNode_Math2::Interpret(symbolTable & table)
   tableEntry * in2 = GetChild(1)->Interpret(table);
   tableEntry * out_var;
 
-  if(in1->GetType() == Type::INT && in2->GetType() == Type::INT) {
-    out_var = table.AddTempEntry(Type::INT);
+  if(in1->GetType() == Type::NUM && in2->GetType() == Type::NUM) {
+    out_var = table.AddTempEntry(Type::NUM);
     float in1_val = in1->GetFloatValue();
     float in2_val = in2->GetFloatValue();
 
@@ -151,14 +153,33 @@ tableEntry * ASTNode_Math2::Interpret(symbolTable & table)
 }
 
 
+ASTNode_BoolCast::ASTNode_BoolCast(ASTNode * in)
+  : ASTNode(Type::NUM)
+{
+  children.push_back(in);
+}
+
+
+tableEntry * ASTNode_BoolCast::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+  tableEntry * out_var = table.AddTempEntry(Type::BOOL);
+
+  if(in_var->GetType() == Type::NUM) {
+    out_var->SetBoolValue(in_var->GetFloatValue() != 0);
+  }
+
+  return out_var;
+}
+
 /////////////////////
 // ASTNode_Bool2
 
 ASTNode_Bool2::ASTNode_Bool2(ASTNode * in1, ASTNode * in2, int op)
-  : ASTNode(Type::INT), bool_op(op)
+  : ASTNode(Type::NUM), bool_op(op)
 {
-  ASTNode * in_test = (in1->GetType() != Type::INT) ? in1 : in2;
-  if (in_test->GetType() != Type::INT) {
+  ASTNode * in_test = (in1->GetType() != Type::NUM) ? in1 : in2;
+  if (in_test->GetType() != Type::NUM) {
     std::string err_message = "cannot use type '";
     err_message += Type::AsString(in_test->GetType());
     err_message += "' in mathematical expressions";
@@ -183,11 +204,6 @@ tableEntry * ASTNode_Bool2::Interpret(symbolTable & table)
 ASTNode_If::ASTNode_If(ASTNode * in1, ASTNode * in2, ASTNode * in3)
   : ASTNode(Type::VOID)
 {
-  if (in1->GetType() != Type::INT) {
-    yyerror("condition for if statements must evaluate to type int");
-    exit(1);
-  }
-
   children.push_back(in1);
   children.push_back(in2);
   children.push_back(in3);
@@ -209,7 +225,7 @@ ASTNode_While::ASTNode_While(ASTNode * in1, ASTNode * in2)
   children.push_back(in1);
   children.push_back(in2);
 
-  if (in1->GetType() != Type::INT) {
+  if (in1->GetType() != Type::NUM) {
     yyerror("condition for while statements must evaluate to type int");
     exit(1);
   }
@@ -253,9 +269,16 @@ tableEntry * ASTNode_Print::Interpret(symbolTable & table)
   for (int i = 0; i < GetNumChildren(); i++) {
     tableEntry * cur_var = GetChild(i)->Interpret(table);
     switch (cur_var->GetType()) {
-      case Type::INT:
+      case Type::NUM:
         std::cout << cur_var->GetFloatValue();
         break;
+      case Type::BOOL:
+        if(cur_var->GetBoolValue()) {
+          std::cout << "true";
+        }
+        else {
+          std::cout << "false";
+        }
     }
   }
 

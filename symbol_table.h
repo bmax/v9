@@ -68,7 +68,7 @@ public:
   void SetScope(int in_scope) { scope = in_scope; }
   void SetNext(tableEntry * in_next) { next = in_next; }
   void SetFloatValue(float f) { this->f = f; }
-  void SetBoolValue(bool f) { this->b = b; }
+  void SetBoolValue(bool b) { this->b = b; }
 };
 
 

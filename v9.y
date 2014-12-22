@@ -35,8 +35,8 @@ void yyerror2(std::string err_string, int orig_line) {
   ASTNode * ast_node;
 }
 
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR CONSOLE LOG COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
-%token <lexeme> INT_LIT CHAR_LIT ID VAR
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR CONSOLE LOG BOOLEAN COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
+%token <lexeme> INT_LIT ID VAR
 
 %right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
 %left BOOL_OR
@@ -202,14 +202,14 @@ expression:  expression '+' expression {
              }
 	|    '(' expression ')' { $$ = $2; } // Ignore parens; used for order
 	|    INT_LIT {
-               $$ = new ASTNode_Literal(Type::INT, $1);
-               $$->SetLineNum(line_num);
-             }
-	|    CHAR_LIT {
-               $$ = new ASTNode_Literal(Type::CHAR, $1);
+               $$ = new ASTNode_Literal(Type::NUM, $1);
                $$->SetLineNum(line_num);
              }
 	|    var_usage { $$ = $1; }
+  |   BOOLEAN '(' expression ')' {
+        $$ = new ASTNode_BoolCast($3);
+        $$->SetLineNum(line_num);
+      }
 	;
 
 argument_list:	argument_list ',' expression {

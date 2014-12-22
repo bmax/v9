@@ -16,7 +16,6 @@ int line_num = 1;
 
 id	        [_a-zA-Z][a-zA-Z0-9_]*
 int_lit         [0-9]+
-char_lit        '(.|(\\[\\'nt]))'
 comment		#.*
 whitespace	[ \t\r]
 passthrough	[+\-*/%=(),!{}[\].;]
@@ -29,11 +28,11 @@ passthrough	[+\-*/%=(),!{}[\].;]
 "break"   { return COMMAND_BREAK; }
 "console" { return CONSOLE; }
 "log"     { return LOG; }
+"Boolean" { return BOOLEAN; }
 
 "var"         { yylval.lexeme = strdup(yytext);  return VAR; }
 {id}          { yylval.lexeme = strdup(yytext);  return ID; }
 {int_lit}     { yylval.lexeme = strdup(yytext);  return INT_LIT; }
-{char_lit}    { yylval.lexeme = strdup(yytext);  return CHAR_LIT; }
 
 {passthrough}  { yylval.lexeme = strdup(yytext);  return (int) yytext[0]; }
 
