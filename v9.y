@@ -3,41 +3,41 @@
 #include <string>
 #include <fstream>
 #include <stdio.h>
-
+ 
 #include "symbol_table.h"
 #include "ast.h"
 #include "type_info.h"
-
+ 
 extern int line_num;
 extern int yylex();
-
+ 
 symbolTable symbol_table;
 int error_count = 0;
-
+ 
 // Create an error function to call when the current line has an error
 void yyerror(std::string err_string) {
   std::cout << "ERROR(line " << line_num << "): "
        << err_string << std::endl;
   error_count++;
 }
-
+ 
 // Create an alternate error function when a *different* line than being read in has an error.
 void yyerror2(std::string err_string, int orig_line) {
   std::cout << "ERROR(line " << orig_line << "): "
        << err_string << std::endl;
   error_count++;
 }
-
+ 
 %}
-
+ 
 %union {
   char * lexeme;
   ASTNode * ast_node;
 }
-
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR CONSOLE LOG BOOLEAN COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
+ 
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR CONSOLE LOG BOOLEAN COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
 %token <lexeme> INT_LIT ID VAR
-
+ 
 %right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
 %left BOOL_OR
 %left BOOL_AND
@@ -46,20 +46,20 @@ void yyerror2(std::string err_string, int orig_line) {
 %left '*' '/' '%'
 %nonassoc UMINUS '!'
 %left '.'
-
+ 
 %nonassoc NOELSE
 %nonassoc COMMAND_ELSE
-
-
+ 
+ 
 %type <ast_node> var_declare expression declare_assign statement statement_list var_usage lhs_ok command argument_list code_block if_start while_start flow_command
 %%
-
+ 
 program:      statement_list {
                  // Traverse AST
                  $1->Interpret(symbol_table);
               }
              ;
-
+ 
 statement_list:         {
                    $$ = new ASTNode_Block;
                  }
@@ -68,7 +68,7 @@ statement_list:         {
                    $$ = $1;
                  }
         ;
-
+ 
 statement:   var_declare ';'    {  $$ = $1;  }
         |    declare_assign ';' {  $$ = $1;  }
         |    expression ';'     {  $$ = $1;  }
@@ -77,7 +77,7 @@ statement:   var_declare ';'    {  $$ = $1;  }
         |    code_block         {  $$ = $1;  }
         |    ';'                {  $$ = NULL;  }
         ;
-
+ 
 var_declare:        VAR ID {
                   if (symbol_table.InCurScope($2) != 0) {
                     std::string err_string = "redeclaration of variable '";
@@ -86,19 +86,19 @@ var_declare:        VAR ID {
                     yyerror(err_string);
                     exit(1);
                   }
-
+ 
                   tableEntry * cur_entry = symbol_table.AddEntry(0, $2);
                   $$ = new ASTNode_Variable(cur_entry);
                   $$->SetLineNum(line_num);
                 }
         ;
-
+ 
 declare_assign:  var_declare '=' expression {
                    $$ = new ASTNode_Assign($1, $3);
                    $$->SetLineNum(line_num);
                  }
         ;
-
+ 
 var_usage:   ID {
                tableEntry * cur_entry = symbol_table.Lookup($1);
                if (cur_entry == NULL) {
@@ -112,11 +112,11 @@ var_usage:   ID {
                $$->SetLineNum(line_num);
              }
         ;
-
+ 
 lhs_ok:  var_usage { $$ = $1; }
       ;
-
-expression:  expression '+' expression { 
+ 
+expression:  expression '+' expression {
                $$ = new ASTNode_Math2($1, $3, '+');
                $$->SetLineNum(line_num);
              }
@@ -192,6 +192,18 @@ expression:  expression '+' expression {
                $$ = new ASTNode_Assign($1, new ASTNode_Math2($1, $3, '%') );
                $$->SetLineNum(line_num);
              }
+        |    INCREMENT var_usage {
+               ASTNode * one_const = new ASTNode_Literal(Type::NUM, "1");
+               ASTNode * addition = new ASTNode_Math2($2, one_const, '+');
+               $$ = new ASTNode_Assign($2, addition);
+               $$->SetLineNum(line_num);
+             }
+        |    DECREMENT var_usage {
+               ASTNode * one_const = new ASTNode_Literal(Type::NUM, "1");
+               ASTNode * subtraction = new ASTNode_Math2($2, one_const, '-');
+               $$ = new ASTNode_Assign($2, subtraction);
+               $$->SetLineNum(line_num);
+             }
         |    '-' expression %prec UMINUS {
                $$ = new ASTNode_Math1($2, '-');
                $$->SetLineNum(line_num);
@@ -211,7 +223,7 @@ expression:  expression '+' expression {
                $$->SetLineNum(line_num);
             }
         ;
-
+ 
 argument_list:        argument_list ',' expression {
                   ASTNode * node = $1; // Grab the node used for arg list.
                   node->AddChild($3);    // Save this argument in the node.
@@ -224,7 +236,7 @@ argument_list:        argument_list ',' expression {
                   $$->SetLineNum(line_num);
                 }
         ;
-
+ 
 command:   CONSOLE '.' LOG '(' argument_list ')' {
              $$ = new ASTNode_Print(NULL);
              $$->TransferChildren($5);
@@ -236,19 +248,19 @@ command:   CONSOLE '.' LOG '(' argument_list ')' {
              $$->SetLineNum(line_num);
            }
         ;
-
+ 
 if_start:  COMMAND_IF '(' expression ')' {
              $$ = new ASTNode_If(new ASTNode_BoolCast($3), NULL, NULL);
              $$->SetLineNum(line_num);
            }
         ;
-
+ 
 while_start:  COMMAND_WHILE '(' expression ')' {
                 $$ = new ASTNode_While($3, NULL);
                 $$->SetLineNum(line_num);
               }
            ;
-
+ 
 flow_command:  if_start statement COMMAND_ELSE statement {
                  $$->SetChild(1, $2);
                  $$->SetChild(2, $4);
@@ -263,20 +275,20 @@ flow_command:  if_start statement COMMAND_ELSE statement {
                  $$->SetChild(1, $2);
                }
             ;
-
+ 
 block_start: '{' { symbol_table.IncScope(); } ;
 block_end:   '}' { symbol_table.DecScope(); } ;
 code_block:  block_start statement_list block_end { $$ = $2; } ;
-
+ 
 %%
 void LexMain(int argc, char * argv[]);
-
+ 
 int main(int argc, char * argv[])
 {
   error_count = 0;
   LexMain(argc, argv);
-
+ 
   yyparse();
-
+ 
   return 0;
 }
