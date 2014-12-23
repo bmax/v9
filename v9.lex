@@ -8,17 +8,16 @@
 #include <stdio.h>
 #include <string>
 
-// Two global variables (not clean, but works...)
 int line_num = 1;
 %}
 
 %option nounput
 
-id	        [_a-zA-Z][a-zA-Z0-9_]*
-int_lit         [0-9]+
-comment		#.*
-whitespace	[ \t\r]
-passthrough	[+\-*/%=(),!{}[\].;]
+id          [_a-zA-Z][a-zA-Z0-9_]*
+int_lit     [0-9]+
+comment     #.*
+whitespace  [ \t\r]
+passthrough [+\-*/%=(),!{}[\].;]
 
 %%
 
@@ -33,8 +32,7 @@ passthrough	[+\-*/%=(),!{}[\].;]
 "var"         { yylval.lexeme = strdup(yytext);  return VAR; }
 {id}          { yylval.lexeme = strdup(yytext);  return ID; }
 {int_lit}     { yylval.lexeme = strdup(yytext);  return INT_LIT; }
-
-{passthrough}  { yylval.lexeme = strdup(yytext);  return (int) yytext[0]; }
+{passthrough} { yylval.lexeme = strdup(yytext);  return (int) yytext[0]; }
 
 "+=" { return CASSIGN_ADD; }
 "-=" { return CASSIGN_SUB; }
@@ -44,9 +42,9 @@ passthrough	[+\-*/%=(),!{}[\].;]
 
 "==" { return COMP_EQU; }
 "!=" { return COMP_NEQU; }
-"<" { return COMP_LESS; }
+"<"  { return COMP_LESS; }
 "<=" { return COMP_LTE; }
-">" { return COMP_GTR; }
+">"  { return COMP_GTR; }
 ">=" { return COMP_GTE; }
 
 "&&" { return BOOL_AND; }
@@ -54,9 +52,9 @@ passthrough	[+\-*/%=(),!{}[\].;]
 
 {comment} { ; }
 {whitespace} { ; }
-\n  { line_num++; }
+\n { line_num++; }
 
-.      { std::cout << "ERROR(line " << line_num << "): Unknown Token '" << yytext << "'." << std::endl; exit(1); }
+. { std::cout << "ERROR(line " << line_num << "): Unknown Token '" << yytext << "'." << std::endl; exit(1); }
 
 %%
 
