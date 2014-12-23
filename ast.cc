@@ -139,11 +139,44 @@ tableEntry * ASTNode_Math2::Interpret(symbolTable & table)
     float in2_val = in2->GetFloatValue();
 
     if (math_op == '+') { out_var->SetFloatValue(in1_val + in2_val); }
-    else if (math_op == '+') { out_var->SetFloatValue(in1_val + in2_val); }
     else if (math_op == '-') { out_var->SetFloatValue(in1_val - in2_val); }
     else if (math_op == '*') { out_var->SetFloatValue(in1_val * in2_val); }
     else if (math_op == '/') { out_var->SetFloatValue(in1_val / in2_val); }
     else if (math_op == '%') { out_var->SetFloatValue(fmod(in1_val, in2_val)); }
+  }
+
+  return out_var;
+}
+
+ASTNode_Comparison::ASTNode_Comparison(ASTNode * in1, ASTNode * in2, int op)
+  : ASTNode(Type::BOOL), comp_op(op)
+{
+  children.push_back(in1);
+  children.push_back(in2);
+}
+
+
+tableEntry * ASTNode_Comparison::Interpret(symbolTable & table)
+{
+  tableEntry * in1 = GetChild(0)->Interpret(table);
+  tableEntry * in2 = GetChild(1)->Interpret(table);
+  tableEntry * out_var;
+
+  if(in1->GetType() == Type::NUM && in2->GetType() == Type::NUM) {
+    out_var = table.AddTempEntry(Type::BOOL);
+    float in1_val = in1->GetFloatValue();
+    float in2_val = in2->GetFloatValue();
+
+    bool value;
+
+    if (comp_op == COMP_EQU) { value = (in1_val == in2_val); }
+    else if (comp_op == COMP_NEQU) { value = (in1_val != in2_val); }
+    else if (comp_op == COMP_GTR) { value = (in1_val > in2_val); }
+    else if (comp_op == COMP_GTE) { value = (in1_val >= in2_val); }
+    else if (comp_op == COMP_LESS) { value = (in1_val < in2_val); }
+    else if (comp_op == COMP_LTE) { value = (in1_val <= in2_val); }
+
+    out_var->SetBoolValue(value);
   }
 
   return out_var;

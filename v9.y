@@ -137,27 +137,27 @@ expression:  expression '+' expression {
                $$->SetLineNum(line_num);
              }
 	|    expression COMP_EQU expression {
-               $$ = new ASTNode_Math2($1, $3, COMP_EQU);
+               $$ = new ASTNode_Comparison($1, $3, COMP_EQU);
                $$->SetLineNum(line_num);
              }
 	|    expression COMP_NEQU expression {
-               $$ = new ASTNode_Math2($1, $3, COMP_NEQU);
+               $$ = new ASTNode_Comparison($1, $3, COMP_NEQU);
                $$->SetLineNum(line_num);
              }
 	|    expression COMP_LESS expression {
-               $$ = new ASTNode_Math2($1, $3, COMP_LESS);
+               $$ = new ASTNode_Comparison($1, $3, COMP_LESS);
                $$->SetLineNum(line_num);
              }
 	|    expression COMP_LTE expression {
-               $$ = new ASTNode_Math2($1, $3, COMP_LTE);
+               $$ = new ASTNode_Comparison($1, $3, COMP_LTE);
                $$->SetLineNum(line_num);
              }
 	|    expression COMP_GTR expression {
-               $$ = new ASTNode_Math2($1, $3, COMP_GTR);
+               $$ = new ASTNode_Comparison($1, $3, COMP_GTR);
                $$->SetLineNum(line_num);
              }
 	|    expression COMP_GTE expression {
-               $$ = new ASTNode_Math2($1, $3, COMP_GTE);
+               $$ = new ASTNode_Comparison($1, $3, COMP_GTE);
                $$->SetLineNum(line_num);
              }
 	|    expression BOOL_AND expression {

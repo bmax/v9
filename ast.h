@@ -124,6 +124,16 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+class ASTNode_Comparison : public ASTNode {
+protected:
+  int comp_op;
+public:
+  ASTNode_Comparison(ASTNode * in1, ASTNode * in2, int op);
+  virtual ~ASTNode_Comparison() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 class ASTNode_BoolCast : public ASTNode {
 public:
   ASTNode_BoolCast(ASTNode * in);
