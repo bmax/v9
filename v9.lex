@@ -63,23 +63,17 @@ void LexMain(int argc, char * argv[])
   FILE * file = NULL;
   bool input_found = false;
 
-  // Loop through all of the command-line arguments.
   for (int arg_id = 1; arg_id < argc; arg_id++) {
     std::string cur_arg(argv[arg_id]);
 
     if (cur_arg == "-h") {
-      std::cout << "Tubular Compiler v. 0.4 (Project 4)"  << std::endl
-           << "Format: " << argv[0] << "[flags] [filename]" << std::endl
-           << std::endl
-           << "Available Flags:" << std::endl
-           << "  -h  :  Help (this information)" << std::endl
-        ;
+      std::cout << "V9 JavaScript Engine"  << std::endl;
+      std::cout << "Format: " << argv[0] << "[flags] [filename]" << std::endl;
+      std::cout << "Available Flags:" << std::endl
+      std::cout << "  -h  :  Help (this information)" << std::endl;
       exit(0);
     }
 
-    // PROCESS OTHER ARGUMENTS HERE IF YOU ADD THEM
-
-    // If the next argument begins with a dash, assume it's an unknown flag...
     if (cur_arg[0] == '-') {
       std::cerr << "ERROR: Unknown command-line flag: " << cur_arg << std::endl;
       exit(1);
@@ -98,7 +92,7 @@ void LexMain(int argc, char * argv[])
 
   }
 
-  if (input_found == false) {
+  if (!input_found) {
     std::cerr << "Format: " << argv[0] << " [flags] [input filename]" << std::endl;
     std::cerr << "Type '" << argv[0] << " -h' for help." << std::endl;
     exit(1);
