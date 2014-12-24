@@ -398,23 +398,10 @@ ASTNode_Print::ASTNode_Print(ASTNode * out_child)
 tableEntry * ASTNode_Print::Interpret(symbolTable & table)
 {
   for (int i = 0; i < GetNumChildren(); i++) {
-    tableEntry * cur_var = GetChild(i)->Interpret(table);
-    switch (cur_var->GetType()) {
-      case Type::NUMBER:
-        std::cout << cur_var->GetNumberValue();
-        break;
-      case Type::BOOL:
-        if(cur_var->GetBoolValue()) {
-          std::cout << "true";
-        }
-        else {
-          std::cout << "false";
-        }
-        break;
-      case Type::STRING:
-        std::cout << cur_var->GetStringValue();
-        break;
-    }
+    ASTNode * cast = new ASTNode_StringCast(GetChild(i));
+    tableEntry * cur_var = cast->Interpret(table);
+
+    std::cout << cur_var->GetStringValue();
   }
 
   std::cout << std::endl;
