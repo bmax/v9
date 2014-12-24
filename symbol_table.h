@@ -33,6 +33,7 @@ protected:
   union {
     float f;
     bool b;
+    std::string * s;
   };
 
   tableEntry(int in_type)
@@ -55,13 +56,14 @@ protected:
   virtual ~tableEntry() { ; }
 
 public:
-  int GetType()          const { return type_id; }
-  std::string GetName()  const { return name; }
-  int GetScope()         const { return scope; }
-  bool GetTemp()         const { return is_temp; }
-  tableEntry * GetNext() const { return next; }
-  float GetFloatValue()  const { return f; }
-  bool GetBoolValue()    const { return b; }
+  int GetType()                const { return type_id; }
+  std::string GetName()        const { return name; }
+  int GetScope()               const { return scope; }
+  bool GetTemp()               const { return is_temp; }
+  tableEntry * GetNext()       const { return next; }
+  float GetFloatValue()        const { return f; }
+  bool GetBoolValue()          const { return b; }
+  std::string GetStringValue() const { return *s; }
 
   void SetType(int type) { type_id = type; }
   void SetName(std::string in_name) { name = in_name; }
@@ -69,6 +71,7 @@ public:
   void SetNext(tableEntry * in_next) { next = in_next; }
   void SetFloatValue(float f) { this->f = f; }
   void SetBoolValue(bool b) { this->b = b; }
+  void SetStringValue(std::string s) { this->s = new std::string(s); }
 };
 
 

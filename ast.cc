@@ -59,6 +59,9 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
   if(GetType() == Type::NUM) {
     out_var->SetFloatValue(atof(lexeme.c_str()));
   }
+  else if(GetType() == Type::STRING) {
+    out_var->SetStringValue(lexeme);
+  }
   return out_var;
 }
 
@@ -377,6 +380,10 @@ tableEntry * ASTNode_Print::Interpret(symbolTable & table)
         else {
           std::cout << "false";
         }
+        break;
+      case Type::STRING:
+        std::cout << cur_var->GetStringValue();
+        break;
     }
   }
 

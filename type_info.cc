@@ -5,7 +5,8 @@ namespace Type {
     switch (type) {
     case VOID: return "void";
     case NUM: return "num";
-    case BOOL: return "BOOL";
+    case BOOL: return "bool";
+    case STRING: return "string";
     };
     return "unknown";
   }

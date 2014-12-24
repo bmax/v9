@@ -4,8 +4,8 @@
 #include <string>
 
 namespace Type {
-  enum TypeNames { VOID=0, NUM, BOOL };
-  
+  enum TypeNames { VOID=0, NUM, BOOL, STRING };
+
   std::string AsString(int type); // Convert the internal type to a string like "int"
 
   // Write addtional Type helper methods here, such as bool IsArray(int type) or
