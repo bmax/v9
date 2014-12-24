@@ -89,6 +89,9 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
   else if(left->GetType() == Type::BOOL) {
     left->SetBoolValue(right->GetBoolValue());
   }
+  else if(left->GetType() == Type::STRING) {
+    left->SetStringValue(right->GetStringValue());
+  }
 
   return left;
 }
