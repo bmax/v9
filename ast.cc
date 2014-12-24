@@ -421,3 +421,38 @@ tableEntry * ASTNode_Print::Interpret(symbolTable & table)
 
   return NULL;
 }
+
+ASTNode_StringCast::ASTNode_StringCast(ASTNode * in)
+  : ASTNode(Type::STRING)
+{
+  children.push_back(in);
+}
+
+
+tableEntry * ASTNode_StringCast::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+  if(in_var->GetType() == Type::STRING) {
+    return in_var;
+  }
+
+  tableEntry * out_var = table.AddTempEntry(Type::STRING);
+
+  std::stringstream ss;
+
+  if(in_var->GetType() == Type::NUMBER) {
+    ss << in_var->GetNumberValue();
+  }
+  else if(in_var->GetType() == Type::BOOL) {
+    if(in_var->GetBoolValue()) {
+      ss << "true";
+    }
+    else {
+      ss << "false";
+    }
+  }
+
+  out_var->SetStringValue(ss.str());
+
+  return out_var;
+}

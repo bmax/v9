@@ -22,13 +22,14 @@ passthrough [+\-*/%=(),!{}[\].;]
  
 %%
  
-"if"      { return COMMAND_IF; }
-"else"    { return COMMAND_ELSE; }
-"while"   { return COMMAND_WHILE; }
-"break"   { return COMMAND_BREAK; }
-"console" { return CONSOLE; }
-"log"     { return LOG; }
-"Boolean" { return BOOLEAN; }
+"if"       { return COMMAND_IF; }
+"else"     { return COMMAND_ELSE; }
+"while"    { return COMMAND_WHILE; }
+"break"    { return COMMAND_BREAK; }
+"console"  { return CONSOLE; }
+"log"      { return LOG; }
+"Boolean"  { return BOOLEAN; }
+"toString" { return TO_STRING; }
  
 "var"         { yylval.lexeme = strdup(yytext);  return VAR; }
 {id}          { yylval.lexeme = strdup(yytext);  return ID; }

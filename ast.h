@@ -194,6 +194,12 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+class ASTNode_StringCast : public ASTNode {
+public:
+  ASTNode_StringCast(ASTNode * in);
+  virtual ~ASTNode_StringCast() { ; }
 
+  tableEntry * Interpret(symbolTable & table);
+};
 
 #endif
