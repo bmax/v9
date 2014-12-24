@@ -56,8 +56,8 @@ ASTNode_Literal::ASTNode_Literal(int in_type, std::string in_lex)
 tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
 {
   tableEntry * out_var = table.AddTempEntry(GetType());
-  if(GetType() == Type::NUM) {
-    out_var->SetFloatValue(atof(lexeme.c_str()));
+  if(GetType() == Type::NUMBER) {
+    out_var->SetNumberValue(atof(lexeme.c_str()));
   }
   else if(GetType() == Type::STRING) {
     out_var->SetStringValue(lexeme);
@@ -83,8 +83,8 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
 
   left->SetType(right->GetType());
 
-  if(left->GetType() == Type::NUM) {
-    left->SetFloatValue(right->GetFloatValue());
+  if(left->GetType() == Type::NUMBER) {
+    left->SetNumberValue(right->GetNumberValue());
   }
   else if(left->GetType() == Type::BOOL) {
     left->SetBoolValue(right->GetBoolValue());
@@ -101,7 +101,7 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
 // ASTNode_Math1
 
 ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op)
-  : ASTNode(Type::NUM), math_op(op)
+  : ASTNode(Type::NUMBER), math_op(op)
 {
   children.push_back(in_child);
 }
@@ -109,11 +109,11 @@ ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op)
 tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
 {
   tableEntry * in = GetChild(0)->Interpret(table);
-  tableEntry * out_var = table.AddTempEntry(Type::NUM);
+  tableEntry * out_var = table.AddTempEntry(Type::NUMBER);
 
   switch (math_op) {
     case '-':
-      out_var->SetFloatValue(-in->GetFloatValue());
+      out_var->SetNumberValue(-in->GetNumberValue());
       break;
   }
 
@@ -127,7 +127,7 @@ tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
 // ASTNode_Math2
 
 ASTNode_Math2::ASTNode_Math2(ASTNode * in1, ASTNode * in2, int op)
-  : ASTNode(Type::NUM), math_op(op)
+  : ASTNode(Type::NUMBER), math_op(op)
 {
   children.push_back(in1);
   children.push_back(in2);
@@ -140,32 +140,32 @@ tableEntry * ASTNode_Math2::Interpret(symbolTable & table)
   tableEntry * in2 = GetChild(1)->Interpret(table);
   tableEntry * out_var;
 
-  if(in1->GetType() == Type::NUM && in2->GetType() == Type::NUM) {
-    out_var = table.AddTempEntry(Type::NUM);
-    float in1_val = in1->GetFloatValue();
-    float in2_val = in2->GetFloatValue();
+  if(in1->GetType() == Type::NUMBER && in2->GetType() == Type::NUMBER) {
+    out_var = table.AddTempEntry(Type::NUMBER);
+    float in1_val = in1->GetNumberValue();
+    float in2_val = in2->GetNumberValue();
 
-    if (math_op == '+') { out_var->SetFloatValue(in1_val + in2_val); }
-    else if (math_op == '-') { out_var->SetFloatValue(in1_val - in2_val); }
-    else if (math_op == '*') { out_var->SetFloatValue(in1_val * in2_val); }
-    else if (math_op == '/') { out_var->SetFloatValue(in1_val / in2_val); }
-    else if (math_op == '%') { out_var->SetFloatValue(fmod(in1_val, in2_val)); }
+    if (math_op == '+') { out_var->SetNumberValue(in1_val + in2_val); }
+    else if (math_op == '-') { out_var->SetNumberValue(in1_val - in2_val); }
+    else if (math_op == '*') { out_var->SetNumberValue(in1_val * in2_val); }
+    else if (math_op == '/') { out_var->SetNumberValue(in1_val / in2_val); }
+    else if (math_op == '%') { out_var->SetNumberValue(fmod(in1_val, in2_val)); }
   }
-  else if(in1->GetType() == Type::NUM && in2->GetType() == Type::STRING) {
+  else if(in1->GetType() == Type::NUMBER && in2->GetType() == Type::STRING) {
     out_var = table.AddTempEntry(Type::STRING);
 
     std::stringstream ss;
-    ss << in1->GetFloatValue();
+    ss << in1->GetNumberValue();
     std::string in1_val = ss.str();
     std::string in2_val = in2->GetStringValue();
 
     if (math_op == '+') { out_var->SetStringValue(in1_val + in2_val); }
   }
-  else if(in1->GetType() == Type::STRING && in2->GetType() == Type::NUM) {
+  else if(in1->GetType() == Type::STRING && in2->GetType() == Type::NUMBER) {
     out_var = table.AddTempEntry(Type::STRING);
 
     std::stringstream ss;
-    ss << in2->GetFloatValue();
+    ss << in2->GetNumberValue();
     std::string in1_val = in1->GetStringValue();
     std::string in2_val = ss.str();
 
@@ -196,10 +196,10 @@ tableEntry * ASTNode_Comparison::Interpret(symbolTable & table)
   tableEntry * in2 = GetChild(1)->Interpret(table);
   tableEntry * out_var;
 
-  if(in1->GetType() == Type::NUM && in2->GetType() == Type::NUM) {
+  if(in1->GetType() == Type::NUMBER && in2->GetType() == Type::NUMBER) {
     out_var = table.AddTempEntry(Type::BOOL);
-    float in1_val = in1->GetFloatValue();
-    float in2_val = in2->GetFloatValue();
+    float in1_val = in1->GetNumberValue();
+    float in2_val = in2->GetNumberValue();
 
     bool value;
 
@@ -218,7 +218,7 @@ tableEntry * ASTNode_Comparison::Interpret(symbolTable & table)
 
 
 ASTNode_BoolCast::ASTNode_BoolCast(ASTNode * in)
-  : ASTNode(Type::NUM)
+  : ASTNode(Type::NUMBER)
 {
   children.push_back(in);
 }
@@ -233,8 +233,8 @@ tableEntry * ASTNode_BoolCast::Interpret(symbolTable & table)
 
   tableEntry * out_var = table.AddTempEntry(Type::BOOL);
 
-  if(in_var->GetType() == Type::NUM) {
-    out_var->SetBoolValue(in_var->GetFloatValue() != 0);
+  if(in_var->GetType() == Type::NUMBER) {
+    out_var->SetBoolValue(in_var->GetNumberValue() != 0);
   }
 
   return out_var;
@@ -266,7 +266,7 @@ tableEntry * ASTNode_Bool1::Interpret(symbolTable & table)
 // ASTNode_Bool2
 
 ASTNode_Bool2::ASTNode_Bool2(ASTNode * in1, ASTNode * in2, int op)
-  : ASTNode(Type::NUM), bool_op(op)
+  : ASTNode(Type::NUMBER), bool_op(op)
 {
   children.push_back(in1);
   children.push_back(in2);
@@ -400,8 +400,8 @@ tableEntry * ASTNode_Print::Interpret(symbolTable & table)
   for (int i = 0; i < GetNumChildren(); i++) {
     tableEntry * cur_var = GetChild(i)->Interpret(table);
     switch (cur_var->GetType()) {
-      case Type::NUM:
-        std::cout << cur_var->GetFloatValue();
+      case Type::NUMBER:
+        std::cout << cur_var->GetNumberValue();
         break;
       case Type::BOOL:
         if(cur_var->GetBoolValue()) {

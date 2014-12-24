@@ -31,7 +31,7 @@ protected:
   tableEntry * next; // A pointer to another variable that this one is shadowing
 
   union {
-    float f;
+    float n;
     bool b;
     std::string * s;
   };
@@ -61,7 +61,7 @@ public:
   int GetScope()               const { return scope; }
   bool GetTemp()               const { return is_temp; }
   tableEntry * GetNext()       const { return next; }
-  float GetFloatValue()        const { return f; }
+  float GetNumberValue()       const { return n; }
   bool GetBoolValue()          const { return b; }
   std::string GetStringValue() const { return *s; }
 
@@ -69,7 +69,7 @@ public:
   void SetName(std::string in_name) { name = in_name; }
   void SetScope(int in_scope) { scope = in_scope; }
   void SetNext(tableEntry * in_next) { next = in_next; }
-  void SetFloatValue(float f) { this->f = f; }
+  void SetNumberValue(float n) { this->n = n; }
   void SetBoolValue(bool b) { this->b = b; }
   void SetStringValue(std::string s) { this->s = new std::string(s); }
 };
