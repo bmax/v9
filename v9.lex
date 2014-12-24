@@ -14,7 +14,7 @@ int line_num = 1;
 %option nounput
  
 id          [_a-zA-Z][a-zA-Z0-9_]*
-float_lit   [0-9]+\.[0-9]*|\.[0-9]+
+number_lit  [0-9]+\.[0-9]*|\.[0-9]+|[0-9]+
 string_lit  '(\\.|[^\\']+)*'|\"(\\.|[^\\"]+)*\"
 comment     #.*
 whitespace  [ \t\r]
@@ -33,7 +33,7 @@ passthrough [+\-*/%=(),!{}[\].;]
  
 "var"         { yylval.lexeme = strdup(yytext);  return VAR; }
 {id}          { yylval.lexeme = strdup(yytext);  return ID; }
-{float_lit}   { yylval.lexeme = strdup(yytext);  return FLOAT_LIT; }
+{number_lit}  { yylval.lexeme = strdup(yytext);  return NUMBER_LIT; }
 {string_lit}  { yylval.lexeme = strdup(yytext);  return STRING_LIT; }
 {passthrough} { yylval.lexeme = strdup(yytext);  return (int) yytext[0]; }
  

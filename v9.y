@@ -36,7 +36,7 @@ void yyerror2(std::string err_string, int orig_line) {
 }
  
 %token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR CONSOLE LOG BOOLEAN TO_STRING COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
-%token <lexeme> FLOAT_LIT STRING_LIT ID VAR
+%token <lexeme> NUMBER_LIT STRING_LIT ID VAR
  
 %right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
 %left BOOL_OR
@@ -213,7 +213,7 @@ expression:  expression '+' expression {
                $$->SetLineNum(line_num);
              }
         |    '(' expression ')' { $$ = $2; }
-        |    FLOAT_LIT {
+        |    NUMBER_LIT {
                $$ = new ASTNode_Literal(Type::NUMBER, $1);
                $$->SetLineNum(line_num);
              }
