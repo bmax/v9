@@ -151,6 +151,33 @@ tableEntry * ASTNode_Math2::Interpret(symbolTable & table)
     else if (math_op == '/') { out_var->SetFloatValue(in1_val / in2_val); }
     else if (math_op == '%') { out_var->SetFloatValue(fmod(in1_val, in2_val)); }
   }
+  else if(in1->GetType() == Type::NUM && in2->GetType() == Type::STRING) {
+    out_var = table.AddTempEntry(Type::STRING);
+
+    std::stringstream ss;
+    ss << in1->GetFloatValue();
+    std::string in1_val = ss.str();
+    std::string in2_val = in2->GetStringValue();
+
+    if (math_op == '+') { out_var->SetStringValue(in1_val + in2_val); }
+  }
+  else if(in1->GetType() == Type::STRING && in2->GetType() == Type::NUM) {
+    out_var = table.AddTempEntry(Type::STRING);
+
+    std::stringstream ss;
+    ss << in2->GetFloatValue();
+    std::string in1_val = in1->GetStringValue();
+    std::string in2_val = ss.str();
+
+    if (math_op == '+') { out_var->SetStringValue(in1_val + in2_val); }
+  }
+  else if(in1->GetType() == Type::STRING && in2->GetType() == Type::STRING) {
+    out_var = table.AddTempEntry(Type::STRING);
+    std::string in1_val = in1->GetStringValue();
+    std::string in2_val = in2->GetStringValue();
+
+    if (math_op == '+') { out_var->SetStringValue(in1_val + in2_val); }
+  }
 
   return out_var;
 }
