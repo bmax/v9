@@ -90,7 +90,14 @@ class ASTNode_Literal : public ASTNode {
 private:
   std::string lexeme;     // When we print, how should this node look?
 public:
+  ASTNode_Literal(int in_type);
   ASTNode_Literal(int in_type, std::string in_lex);
+  tableEntry * Interpret(symbolTable & table);
+};
+
+class ASTNode_Property : public ASTNode {
+public:
+  ASTNode_Property(ASTNode * obj, ASTNode * index);
   tableEntry * Interpret(symbolTable & table);
 };
 

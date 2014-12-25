@@ -48,6 +48,11 @@ tableEntry * ASTNode_Variable::Interpret(symbolTable & table)
 ////////////////////////
 //  ASTNode_Literal
 
+ASTNode_Literal::ASTNode_Literal(int in_type)
+  : ASTNode(in_type)
+{
+}
+
 ASTNode_Literal::ASTNode_Literal(int in_type, std::string in_lex)
   : ASTNode(in_type), lexeme(in_lex)
 {
@@ -62,7 +67,41 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
   else if(GetType() == Type::STRING) {
     out_var->SetStringValue(lexeme);
   }
+  else if(GetType() == Type::OBJECT) {
+    if(lexeme.empty()) {
+      out_var->InitializeObject();
+    }
+  }
   return out_var;
+}
+
+ASTNode_Property::ASTNode_Property(ASTNode * obj, ASTNode * index)
+  : ASTNode(Type::VOID)
+{
+  children.push_back(obj);
+  children.push_back(index);
+}
+
+tableEntry * ASTNode_Property::Interpret(symbolTable & table)
+{
+  tableEntry * obj = GetChild(0)->Interpret(table);
+
+  ASTNode * cast = new ASTNode_StringCast(GetChild(1));
+  std::string sindex = cast->Interpret(table)->GetStringValue();
+
+  tableEntry * prop = obj->GetProperty(sindex);
+  if(prop) {
+    SetType(prop->GetType());
+    return prop;
+  }
+  else {
+    std::string error = "object ";
+    error += obj->GetName();
+    error += " does not have property";
+    error += sindex;
+    yyerror(error);
+  }
+
 }
 
 
@@ -91,6 +130,9 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
   }
   else if(left->GetType() == Type::STRING) {
     left->SetStringValue(right->GetStringValue());
+  }
+  else if(left->GetType() == Type::OBJECT) {
+    left->InitializeObject();
   }
 
   return left;

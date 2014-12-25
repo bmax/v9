@@ -34,6 +34,7 @@ protected:
     float n;
     bool b;
     std::string * s;
+    std::map<std::string, tableEntry*> * o;
   };
 
   tableEntry(int in_type)
@@ -64,6 +65,14 @@ public:
   float GetNumberValue()       const { return n; }
   bool GetBoolValue()          const { return b; }
   std::string GetStringValue() const { return *s; }
+  tableEntry * GetProperty(std::string p) {
+    if(o->find(p) == o->end()) {
+      return NULL;
+    }
+    else {
+      return (*o)[p];
+    }
+  }
 
   void SetType(int type) { type_id = type; }
   void SetName(std::string in_name) { name = in_name; }
@@ -72,6 +81,9 @@ public:
   void SetNumberValue(float n) { this->n = n; }
   void SetBoolValue(bool b) { this->b = b; }
   void SetStringValue(std::string s) { this->s = new std::string(s); }
+  void SetProperty(std::string k, tableEntry * v) { (*o)[k] = v; }
+
+  void InitializeObject() { o = new std::map<std::string, tableEntry*>(); }
 };
 
 
