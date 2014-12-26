@@ -35,7 +35,7 @@ void yyerror2(std::string err_string, int orig_line) {
   ASTNode * ast_node;
 }
  
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR CONSOLE LOG BOOLEAN TO_STRING COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE CONSOLE LOG BOOLEAN TO_STRING COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_BREAK
 %token <lexeme> NUMBER_LIT STRING_LIT ID VAR
  
 %right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
@@ -216,6 +216,14 @@ expression:  expression '+' expression {
         |    '(' expression ')' { $$ = $2; }
         |    NUMBER_LIT {
                $$ = new ASTNode_Literal(Type::NUMBER, $1);
+               $$->SetLineNum(line_num);
+             }
+        |    TRUE {
+               $$ = new ASTNode_Literal(Type::BOOL, "true");
+               $$->SetLineNum(line_num);
+             }
+        |    FALSE {
+               $$ = new ASTNode_Literal(Type::BOOL, "false");
                $$->SetLineNum(line_num);
              }
         |    STRING_LIT {

@@ -26,6 +26,8 @@ passthrough [+\-*/%=(),!{}[\].;]
 "else"     { return COMMAND_ELSE; }
 "while"    { return COMMAND_WHILE; }
 "break"    { return COMMAND_BREAK; }
+"true"     { return TRUE; }
+"false"    { return FALSE; }
 "console"  { return CONSOLE; }
 "log"      { return LOG; }
 "Boolean"  { return BOOLEAN; }

@@ -88,7 +88,7 @@ public:
 
 class ASTNode_Literal : public ASTNode {
 private:
-  std::string lexeme;     // When we print, how should this node look?
+  std::string lexeme;
 public:
   ASTNode_Literal(int in_type);
   ASTNode_Literal(int in_type, std::string in_lex);

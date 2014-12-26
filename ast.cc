@@ -64,6 +64,14 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
   if(GetType() == Type::NUMBER) {
     out_var->SetNumberValue(atof(lexeme.c_str()));
   }
+  else if(GetType() == Type::BOOL) {
+    if(lexeme == "true") {
+      out_var->SetBoolValue(true);
+    }
+    else {
+      out_var->SetBoolValue(false);
+    }
+  }
   else if(GetType() == Type::STRING) {
     out_var->SetStringValue(lexeme);
   }
