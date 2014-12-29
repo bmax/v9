@@ -4,7 +4,7 @@
 #include <string>
 
 namespace Type {
-  enum TypeNames { VOID=0, NUMBER, BOOL, STRING, OBJECT };
+  enum TypeNames { VOID=0, NUMBER, BOOL, STRING, OBJECT, REFERENCE };
 
   std::string AsString(int type); // Convert the internal type to a string like "int"
 

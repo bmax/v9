@@ -8,6 +8,7 @@ namespace Type {
     case BOOL: return "bool";
     case STRING: return "string";
     case OBJECT: return "object";
+    case REFERENCE: return "reference";
     };
     return "unknown";
   }

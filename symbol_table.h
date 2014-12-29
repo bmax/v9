@@ -35,6 +35,7 @@ protected:
     bool b;
     std::string * s;
     std::map<std::string, tableEntry*> * o;
+    tableEntry * r;
   };
 
   tableEntry(int in_type)
