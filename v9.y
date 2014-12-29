@@ -114,7 +114,9 @@ var_usage:   ID {
         ;
  
 lhs_ok:  var_usage { $$ = $1; }
-      |  var_usage '[' expression ']' { $$ = new ASTNode_Property($1, $3); }
+      |  var_usage '[' expression ']' {
+           $$ = new ASTNode_Property($1, $3, true);
+         }
       ;
  
 expression:  expression '+' expression {
@@ -240,7 +242,7 @@ expression:  expression '+' expression {
              }
         |    var_usage { $$ = $1; }
         |    var_usage '[' expression ']' {
-               $$ = new ASTNode_Property($1, $3);
+               $$ = new ASTNode_Property($1, $3, false);
                $$->SetLineNum(line_num);
              }
         |    BOOLEAN '(' expression ')' {

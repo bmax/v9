@@ -83,11 +83,12 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
   return out_var;
 }
 
-ASTNode_Property::ASTNode_Property(ASTNode * obj, ASTNode * index)
-  : ASTNode(Type::VOID)
+ASTNode_Property::ASTNode_Property(ASTNode * obj, ASTNode * index,
+    bool assignment) : ASTNode(Type::VOID)
 {
   children.push_back(obj);
   children.push_back(index);
+  this->assignment = assignment;
 }
 
 tableEntry * ASTNode_Property::Interpret(symbolTable & table)
@@ -97,17 +98,24 @@ tableEntry * ASTNode_Property::Interpret(symbolTable & table)
   ASTNode * cast = new ASTNode_StringCast(GetChild(1));
   std::string sindex = cast->Interpret(table)->GetStringValue();
 
-  tableEntry * prop = obj->GetProperty(sindex);
-  if(prop) {
-    SetType(prop->GetType());
+  if(assignment) {
+    tableEntry * prop = table.AddTempEntry(Type::VOID);
+    obj->SetProperty(sindex, prop);
     return prop;
   }
   else {
-    std::string error = "object ";
-    error += obj->GetName();
-    error += " does not have property";
-    error += sindex;
-    yyerror(error);
+    tableEntry * prop = obj->GetProperty(sindex);
+    if(prop) {
+      SetType(prop->GetType());
+      return prop;
+    }
+    else {
+      std::string error = "object ";
+      error += obj->GetName();
+      error += " does not have property";
+      error += sindex;
+      yyerror(error);
+    }
   }
 
 }

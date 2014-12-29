@@ -96,8 +96,10 @@ public:
 };
 
 class ASTNode_Property : public ASTNode {
+private:
+  bool assignment;
 public:
-  ASTNode_Property(ASTNode * obj, ASTNode * index);
+  ASTNode_Property(ASTNode * obj, ASTNode * index, bool assignment);
   tableEntry * Interpret(symbolTable & table);
 };
 
