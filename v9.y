@@ -117,6 +117,10 @@ lhs_ok:  var_usage { $$ = $1; }
       |  var_usage '[' expression ']' {
            $$ = new ASTNode_Property($1, $3, true);
          }
+      |  var_usage '.' ID {
+           ASTNode * id = new ASTNode_Literal(Type::STRING, $3);
+           $$ = new ASTNode_Property($1, id, true);
+         }
       ;
  
 expression:  expression '+' expression {
@@ -243,6 +247,11 @@ expression:  expression '+' expression {
         |    var_usage { $$ = $1; }
         |    var_usage '[' expression ']' {
                $$ = new ASTNode_Property($1, $3, false);
+               $$->SetLineNum(line_num);
+             }
+        |    var_usage '.' ID  {
+               ASTNode * id = new ASTNode_Literal(Type::STRING, $3);
+               $$ = new ASTNode_Property($1, id, false);
                $$->SetLineNum(line_num);
              }
         |    BOOLEAN '(' expression ')' {
