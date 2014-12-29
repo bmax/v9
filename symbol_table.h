@@ -66,6 +66,7 @@ public:
   float GetNumberValue()       const { return n; }
   bool GetBoolValue()          const { return b; }
   std::string GetStringValue() const { return *s; }
+  tableEntry * GetReference()  const { return r; }
   tableEntry * GetProperty(std::string p) {
     if(o->find(p) == o->end()) {
       return NULL;
@@ -82,6 +83,7 @@ public:
   void SetNumberValue(float n) { this->n = n; }
   void SetBoolValue(bool b) { this->b = b; }
   void SetStringValue(std::string s) { this->s = new std::string(s); }
+  void SetReference(tableEntry * ref) { r = ref; }
   void SetProperty(std::string k, tableEntry * v) { (*o)[k] = v; }
 
   void InitializeObject() { o = new std::map<std::string, tableEntry*>(); }
