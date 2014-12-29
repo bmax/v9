@@ -41,7 +41,12 @@ tableEntry * ASTNode_Block::Interpret(symbolTable & table)
 
 tableEntry * ASTNode_Variable::Interpret(symbolTable & table)
 {
-  return var_entry;   // Return the symbol-table entry associated with this variable.
+  if(var_entry->GetType() == Type::OBJECT) {
+    return var_entry->GetReference();
+  }
+  else {
+    return var_entry;
+  }
 }
 
 
@@ -148,7 +153,7 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
     left->SetStringValue(right->GetStringValue());
   }
   else if(left->GetType() == Type::OBJECT) {
-    left->InitializeObject();
+    left->SetReference(right);
   }
 
   return left;
