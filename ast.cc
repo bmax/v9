@@ -431,6 +431,35 @@ tableEntry * ASTNode_While::Interpret(symbolTable & table)
   return NULL;
 }
 
+ASTNode_For::ASTNode_For(ASTNode * in1, ASTNode * in2, ASTNode * in3,
+    ASTNode * in4) : ASTNode(Type::VOID)
+{
+  children.push_back(in1);
+  children.push_back(in2);
+  children.push_back(in3);
+  children.push_back(in4);
+}
+
+
+tableEntry * ASTNode_For::Interpret(symbolTable & table)
+{
+  ASTNode_BoolCast * cast = new ASTNode_BoolCast(GetChild(1));
+
+  if(GetChild(0)) {
+    tableEntry * in0 = GetChild(0)->Interpret(table);
+  }
+  while(cast->Interpret(table)->GetBoolValue()) {
+    if (GetChild(3)) {
+      tableEntry * in3 = GetChild(3)->Interpret(table);
+    }
+    if (GetChild(2)) {
+      tableEntry * in2 = GetChild(2)->Interpret(table);
+    }
+  }
+
+  return NULL;
+}
+
 
 /////////////////////
 // ASTNode_Break

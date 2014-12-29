@@ -25,6 +25,7 @@ passthrough [+\-*/%=(),!{}[\].;]
 "if"       { return COMMAND_IF; }
 "else"     { return COMMAND_ELSE; }
 "while"    { return COMMAND_WHILE; }
+"for"      { return COMMAND_FOR; }
 "break"    { return COMMAND_BREAK; }
 "true"     { return TRUE; }
 "false"    { return FALSE; }

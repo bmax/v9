@@ -187,6 +187,14 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+class ASTNode_For : public ASTNode {
+public:
+  ASTNode_For(ASTNode * in1, ASTNode * in2, ASTNode * in3, ASTNode * in4);
+  virtual ~ASTNode_For() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 class ASTNode_Break : public ASTNode {
 public:
   ASTNode_Break();
