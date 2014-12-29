@@ -460,6 +460,44 @@ tableEntry * ASTNode_For::Interpret(symbolTable & table)
   return NULL;
 }
 
+ASTNode_ForIn::ASTNode_ForIn(ASTNode * in1, ASTNode * in2, ASTNode * in3)
+  : ASTNode(Type::VOID)
+{
+  children.push_back(in1);
+  children.push_back(in2);
+  children.push_back(in3);
+}
+
+
+tableEntry * ASTNode_ForIn::Interpret(symbolTable & table)
+{
+  // Setup a variable to be assigned at each iteration
+  tableEntry * iterator = GetChild(0)->Interpret(table);
+  ASTNode * iterator_usage = new ASTNode_Variable(iterator);
+
+  // The item to be iterated over
+  tableEntry * iterable = GetChild(1)->Interpret(table);
+
+  if(iterable->GetType() == Type::OBJECT) {
+    // Iterate over each property of the object
+    std::map<std::string, tableEntry*> * pm = iterable->GetPropertyMap();
+    for (std::map<std::string, tableEntry*>::iterator i = pm->begin();
+         i != pm->end(); i++) {
+      // Assign the iterator
+      ASTNode * prop_str = new ASTNode_Literal(Type::STRING, i->first);
+      ASTNode * assignment = new ASTNode_Assign(iterator_usage, prop_str);
+      assignment->Interpret(table);
+
+      // Run body of loop
+      if(GetChild(2)) {
+        GetChild(2)->Interpret(table);
+      }
+    }
+  }
+
+  return NULL;
+}
+
 
 /////////////////////
 // ASTNode_Break

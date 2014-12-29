@@ -35,7 +35,7 @@ void yyerror2(std::string err_string, int orig_line) {
   ASTNode * ast_node;
 }
  
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE CONSOLE LOG BOOLEAN TO_STRING COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_BREAK
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE CONSOLE LOG BOOLEAN TO_STRING COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK
 %token <lexeme> NUMBER_LIT STRING_LIT ID VAR
  
 %right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
@@ -51,7 +51,7 @@ void yyerror2(std::string err_string, int orig_line) {
 %nonassoc COMMAND_ELSE
  
  
-%type <ast_node> var_declare expression declare_assign statement statement_list var_usage lhs_ok command argument_list code_block if_start while_start for_declare for_start flow_command
+%type <ast_node> var_declare expression declare_assign statement statement_list var_usage lhs_ok command argument_list code_block if_start while_start for_declare for_start for_in_start flow_command
 %%
  
 program:      statement_list {
@@ -311,6 +311,12 @@ for_start:  COMMAND_FOR '(' for_declare ';' expression ';' expression ')' {
               }
            ;
 
+for_in_start:  COMMAND_FOR '(' var_declare COMMAND_IN var_usage ')' {
+                $$ = new ASTNode_ForIn($3, $5, NULL);
+                $$->SetLineNum(line_num);
+              }
+           ;
+
 flow_command:  if_start statement COMMAND_ELSE statement {
                  $$->SetChild(1, $2);
                  $$->SetChild(2, $4);
@@ -327,6 +333,10 @@ flow_command:  if_start statement COMMAND_ELSE statement {
             |  for_start statement {
                  $$ = $1;
                  $$->SetChild(3, $2);
+               }
+            |  for_in_start statement {
+                 $$ = $1;
+                 $$->SetChild(2, $2);
                }
             ;
  

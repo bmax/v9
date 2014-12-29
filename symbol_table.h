@@ -75,6 +75,7 @@ public:
       return (*o)[p];
     }
   }
+  std::map<std::string, tableEntry*>  * GetPropertyMap() const { return o; }
 
   void SetType(int type) { type_id = type; }
   void SetName(std::string in_name) { name = in_name; }
