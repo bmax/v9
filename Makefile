@@ -22,10 +22,10 @@ v9-parser.tab.o: v9-parser.tab.cc v9.y symbol_table.h
 # Compile the individual code files into object files.
 
 v9-lexer.cc: v9.lex v9-parser.tab.cc symbol_table.h
-	$(LEX) -ov9-lexer.cc v9.lex
+	$(LEX) -o v9-lexer.cc v9.lex
 
 v9-parser.tab.cc: v9.y symbol_table.h
-	$(YACC) -o v9-parser.tab.cc -d v9.y
+	$(YACC) -v -o v9-parser.tab.cc -d v9.y
 
 ast.o: ast.cc ast.h symbol_table.h
 	$(GCC) $(CFLAGS) -c ast.cc
