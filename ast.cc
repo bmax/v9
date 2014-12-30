@@ -160,6 +160,7 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
   }
   else if(left->GetType() == Type::OBJECT) {
     left->SetReference(right);
+    left->SetType(Type::REFERENCE);
   }
 
   return left;
