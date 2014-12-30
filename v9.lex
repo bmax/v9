@@ -18,7 +18,7 @@ number_lit  [0-9]+\.[0-9]*|\.[0-9]+|[0-9]+
 string_lit  '(\\.|[^\\']+)*'|\"(\\.|[^\\"]+)*\"
 comment     #.*
 whitespace  [ \t\r]
-passthrough [+\-*/%=(),!{}[\].;]
+passthrough [+\-*/%=(),!{}[\].;:]
  
 %%
  

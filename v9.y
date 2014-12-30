@@ -51,7 +51,7 @@ void yyerror2(std::string err_string, int orig_line) {
 %nonassoc COMMAND_ELSE
  
  
-%type <ast_node> var_declare expression declare_assign statement statement_list var_usage lhs_ok command argument_list code_block if_start while_start for_declare for_start for_in_start flow_command
+%type <ast_node> var_declare expression declare_assign statement statement_list var_usage lhs_ok command argument_list property_list code_block if_start while_start for_declare for_start for_in_start flow_command
 %%
  
 program:      statement_list {
@@ -122,6 +122,23 @@ lhs_ok:  var_usage { $$ = $1; }
            $$ = new ASTNode_Property($1, id, true);
          }
       ;
+
+property_list:  property_list ',' ID ':' expression {
+                  ASTNode * node = $1; // Grab the node used for arg list.
+                  ASTNode * id = new ASTNode_Literal(Type::STRING, $3);
+                  node->AddChild(id);    // Save this argument in the node.
+                  node->AddChild($5);    // Save this argument in the node.
+                  $$ = node;
+                }
+        |        ID ':' expression {
+                  // Create a temporary AST node to hold the arg list.
+                  $$ = new ASTNode_TempNode(Type::VOID);
+                  ASTNode * id = new ASTNode_Literal(Type::STRING, $1);
+                  $$->AddChild(id);   // Save this argument in the temp node.
+                  $$->AddChild($3);   // Save this argument in the temp node.
+                  $$->SetLineNum(line_num);
+                }
+        ;
  
 expression:  expression '+' expression {
                $$ = new ASTNode_Math2($1, $3, '+');
@@ -244,6 +261,12 @@ expression:  expression '+' expression {
                $$ = new ASTNode_Literal(Type::OBJECT);
                $$->SetLineNum(line_num);
              }
+        |    '{' property_list '}' {
+               $$ = new ASTNode_Literal(Type::OBJECT);
+               $$->TransferChildren($2);
+               delete $2;
+               $$->SetLineNum(line_num);
+             }
         |    var_usage { $$ = $1; }
         |    var_usage '[' expression ']' {
                $$ = new ASTNode_Property($1, $3, false);
@@ -264,7 +287,7 @@ expression:  expression '+' expression {
             }
         ;
  
-argument_list:        argument_list ',' expression {
+argument_list:  argument_list ',' expression {
                   ASTNode * node = $1; // Grab the node used for arg list.
                   node->AddChild($3);    // Save this argument in the node.
                   $$ = node;

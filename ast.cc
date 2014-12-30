@@ -41,7 +41,7 @@ tableEntry * ASTNode_Block::Interpret(symbolTable & table)
 
 tableEntry * ASTNode_Variable::Interpret(symbolTable & table)
 {
-  if(var_entry->GetType() == Type::OBJECT) {
+  if(var_entry->GetType() == Type::REFERENCE) {
     return var_entry->GetReference();
   }
   else {
@@ -81,8 +81,14 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
     out_var->SetStringValue(lexeme);
   }
   else if(GetType() == Type::OBJECT) {
-    if(lexeme.empty()) {
-      out_var->InitializeObject();
+    out_var->InitializeObject();
+    if(GetNumChildren() > 0) {
+      ASTNode * obj = new ASTNode_Variable(out_var);
+      for(int i = 0; i < GetNumChildren(); i += 2) {
+        ASTNode * property = new ASTNode_Property(obj, GetChild(i), true);
+        ASTNode * assign = new ASTNode_Assign(property, GetChild(i + 1));
+        assign->Interpret(table);
+      }
     }
   }
   return out_var;
