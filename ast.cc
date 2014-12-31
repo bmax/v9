@@ -42,7 +42,8 @@ tableEntry * ASTNode_Block::Interpret(symbolTable & table)
 tableEntry * ASTNode_Variable::Interpret(symbolTable & table)
 {
   if(var_entry->GetType() == Type::REFERENCE) {
-    return var_entry->GetReference();
+    ASTNode * var = new ASTNode_Variable(var_entry->GetReference());
+    return var->Interpret(table);
   }
   else {
     return var_entry;
@@ -91,6 +92,10 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
       }
     }
   }
+  else if(GetType() == Type::OBJECT) {
+    out_var->InitializeArray();
+  }
+
   return out_var;
 }
 
@@ -128,7 +133,6 @@ tableEntry * ASTNode_Property::Interpret(symbolTable & table)
       yyerror(error);
     }
   }
-
 }
 
 

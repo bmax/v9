@@ -261,6 +261,10 @@ expression:  expression '+' expression {
                $$ = new ASTNode_Literal(Type::OBJECT);
                $$->SetLineNum(line_num);
              }
+        |    '[' ']' {
+               $$ = new ASTNode_Literal(Type::ARRAY);
+               $$->SetLineNum(line_num);
+             }
         |    '{' property_list '}' {
                $$ = new ASTNode_Literal(Type::OBJECT);
                $$->TransferChildren($2);

@@ -35,6 +35,7 @@ protected:
     bool b;
     std::string * s;
     std::map<std::string, tableEntry*> * o;
+    std::map<unsigned int, tableEntry*> * a;
     tableEntry * r;
   };
 
@@ -76,6 +77,15 @@ public:
     }
   }
   std::map<std::string, tableEntry*>  * GetPropertyMap() const { return o; }
+  tableEntry * GetIndex(unsigned int pos) {
+    if(a->find(pos) == a->end()) {
+      return NULL;
+    }
+    else {
+      return (*a)[pos];
+    }
+  }
+  std::map<unsigned int, tableEntry*>  * GetArrayMap() const { return a; }
 
   void SetType(int type) { type_id = type; }
   void SetName(std::string in_name) { name = in_name; }
@@ -86,8 +96,9 @@ public:
   void SetStringValue(std::string s) { this->s = new std::string(s); }
   void SetReference(tableEntry * ref) { r = ref; }
   void SetProperty(std::string k, tableEntry * v) { (*o)[k] = v; }
-
+  void SetIndex(unsigned int pos, tableEntry * v) { (*a)[pos] = v; }
   void InitializeObject() { o = new std::map<std::string, tableEntry*>(); }
+  void InitializeArray() { a = new std::map<unsigned int, tableEntry*>(); }
 };
 
 
