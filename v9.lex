@@ -16,7 +16,7 @@ int line_num = 1;
 id          [_a-zA-Z][a-zA-Z0-9_]*
 number_lit  [0-9]+\.[0-9]*|\.[0-9]+|[0-9]+
 string_lit  '(\\.|[^\\']+)*'|\"(\\.|[^\\"]+)*\"
-comment     #.*
+comment     \/\/.*
 whitespace  [ \t\r]
 passthrough [+\-*/%=(),!{}[\].;:]
  
