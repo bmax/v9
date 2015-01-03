@@ -1,26 +1,6 @@
 #ifndef AST_H
 #define AST_H
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  The classes in this file hold info about the nodes that form the Abstract Syntax Tree (AST)
-//
-//  ASTNode : The base class for all of the others, with useful virtual functions.
-//
-//  ASTNode_TempNode : AST Node that will be replaced (used for argument lists).
-//  ASTNode_Block : Blocks of statements, including the overall program.
-//  ASTNode_Variable : Leaf node containing a variable.
-//  ASTNode_Literal : Leaf node contiaing a literal value.
-//  ASTNode_Assign : Assignements
-//  ASTNode_Math1 : One-input math operations (unary '-' and '!')
-//  ASTNode_Math2 : Two-input math operations ('+', '-', '*', '/', '%', and comparisons)
-//  ASTNode_Bool2 : Two-input bool operations ('&&' and '||')
-//  ASTNode_If : If-conditional node.
-//  ASTNode_While : While-loop node.
-//  ASTNode_Break : Break node
-//  ASTNode_Print : Print command
-//
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -30,13 +10,14 @@
 #include "type_info.h"
 #include "symbol_table.h"
 
+// The base class for all of the others, with useful virtual functions
 class ASTNode {
 protected:
-  int type;                         // What type should this node pass up?
-  int line_num;                     // What line of the source program generated this node?
-  std::vector<ASTNode *> children;  // What sub-trees does this node have?
+  int type;
+  int line_num;
+  std::vector<ASTNode *> children;
 
-  void SetType(int new_type) { type = new_type; } // Use inside constructor only!
+  void SetType(int new_type) { type = new_type; }
 public:
   ASTNode(int in_type) : type(in_type), line_num(-1) { ; }
   virtual ~ASTNode() {
@@ -59,7 +40,7 @@ public:
 };
 
 
-// A placeholder node in the AST.
+// Node that will be replaced (used for argument lists)
 class ASTNode_TempNode : public ASTNode {
 public:
   ASTNode_TempNode(int in_type) : ASTNode(in_type) { ; }
@@ -67,14 +48,14 @@ public:
   tableEntry * Interpret(symbolTable & table) { return NULL; }
 };
 
-// Block...
+// Blocks of statements, including the overall program
 class ASTNode_Block : public ASTNode {
 public:
   ASTNode_Block() : ASTNode(Type::VOID) { ; }
   tableEntry * Interpret(symbolTable & table);
 };
 
-// Leaves...
+// Simple variale usage
 class ASTNode_Variable : public ASTNode {
 private:
   tableEntry * var_entry;
@@ -86,6 +67,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Literals for several types
 class ASTNode_Literal : public ASTNode {
 private:
   std::string lexeme;
@@ -95,6 +77,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Used to access the property or index of a given object or array
 class ASTNode_Property : public ASTNode {
 private:
   bool assignment;
@@ -103,8 +86,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
-// Math...
-
+// Transfer the value of one table entry to another
 class ASTNode_Assign : public ASTNode {
 public:
   ASTNode_Assign(ASTNode * lhs, ASTNode * rhs);
@@ -113,6 +95,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// One-input math operations (unary '-')
 class ASTNode_Math1 : public ASTNode {
 protected:
   int math_op;
@@ -123,6 +106,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Two-input math operations ('+', '-', '*', '/', '%')
 class ASTNode_Math2 : public ASTNode {
 protected:
   int math_op;
@@ -133,6 +117,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Comparison operators ('<', '>', '<=', '>=', '==', '!=')
 class ASTNode_Comparison : public ASTNode {
 protected:
   int comp_op;
@@ -143,6 +128,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Casts a variable into a boolean value
 class ASTNode_BoolCast : public ASTNode {
 public:
   ASTNode_BoolCast(ASTNode * in);
@@ -151,6 +137,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// One-input bool operations ('!')
 class ASTNode_Bool1 : public ASTNode {
 protected:
   int bool_op;
@@ -161,6 +148,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Two-input bool operations ('&&' and '||')
 class ASTNode_Bool2 : public ASTNode {
 protected:
   int bool_op;
@@ -171,6 +159,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// If-conditional node
 class ASTNode_If : public ASTNode {
 public:
   ASTNode_If(ASTNode * in1, ASTNode * in2, ASTNode * in3);
@@ -179,6 +168,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// While-loop node
 class ASTNode_While : public ASTNode {
 public:
   ASTNode_While(ASTNode * in1, ASTNode * in2);
@@ -187,6 +177,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// For loop node
 class ASTNode_For : public ASTNode {
 public:
   ASTNode_For(ASTNode * in1, ASTNode * in2, ASTNode * in3, ASTNode * in4);
@@ -195,6 +186,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// For-in loop node
 class ASTNode_ForIn : public ASTNode {
 public:
   ASTNode_ForIn(ASTNode * in1, ASTNode * in2, ASTNode * in3);
@@ -203,6 +195,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Break node
 class ASTNode_Break : public ASTNode {
 public:
   ASTNode_Break();
@@ -211,6 +204,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Prints each child, and then a new line
 class ASTNode_Print : public ASTNode {
 public:
   ASTNode_Print(ASTNode * out_child);
@@ -219,6 +213,7 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Casts a variable into a string value
 class ASTNode_StringCast : public ASTNode {
 public:
   ASTNode_StringCast(ASTNode * in);

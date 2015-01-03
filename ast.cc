@@ -4,9 +4,7 @@
 extern void yyerror(std::string err_string);
 extern void yyerror2(std::string err_string, int orig_line);
 
-
-/////////////////////
-//  ASTNode
+// ASTNode
 
 void ASTNode::TransferChildren(ASTNode * from_node)
 {
@@ -19,8 +17,6 @@ void ASTNode::TransferChildren(ASTNode * from_node)
   from_node->children.resize(0);
 }
 
-
-/////////////////////
 //  ASTNode_Block
 
 tableEntry * ASTNode_Block::Interpret(symbolTable & table)
@@ -32,9 +28,7 @@ tableEntry * ASTNode_Block::Interpret(symbolTable & table)
   return NULL;
 }
 
-
-/////////////////////////
-//  ASTNode_Variable
+// ASTNode_Variable
 
 tableEntry * ASTNode_Variable::Interpret(symbolTable & table)
 {
@@ -47,9 +41,7 @@ tableEntry * ASTNode_Variable::Interpret(symbolTable & table)
   }
 }
 
-
-////////////////////////
-//  ASTNode_Literal
+// ASTNode_Literal
 
 ASTNode_Literal::ASTNode_Literal(int in_type)
   : ASTNode(in_type)
@@ -95,6 +87,8 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
 
   return out_var;
 }
+
+// ASTNode_Property
 
 ASTNode_Property::ASTNode_Property(ASTNode * obj, ASTNode * index,
     bool assignment) : ASTNode(Type::VOID)
@@ -157,8 +151,6 @@ tableEntry * ASTNode_Property::Interpret(symbolTable & table)
 
 }
 
-
-//////////////////////
 // ASTNode_Assign
 
 ASTNode_Assign::ASTNode_Assign(ASTNode * lhs, ASTNode * rhs)
@@ -196,8 +188,6 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
   return left;
 }
 
-
-/////////////////////
 // ASTNode_Math1
 
 ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op)
@@ -220,8 +210,6 @@ tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
   return out_var;
 }
 
-
-/////////////////////
 // ASTNode_Math2
 
 ASTNode_Math2::ASTNode_Math2(ASTNode * in1, ASTNode * in2, int op)
@@ -230,7 +218,6 @@ ASTNode_Math2::ASTNode_Math2(ASTNode * in1, ASTNode * in2, int op)
   children.push_back(in1);
   children.push_back(in2);
 }
-
 
 tableEntry * ASTNode_Math2::Interpret(symbolTable & table)
 {
@@ -280,6 +267,8 @@ tableEntry * ASTNode_Math2::Interpret(symbolTable & table)
   return out_var;
 }
 
+// ASTNode_Comparison
+
 ASTNode_Comparison::ASTNode_Comparison(ASTNode * in1, ASTNode * in2, int op)
   : ASTNode(Type::BOOL), comp_op(op)
 {
@@ -314,13 +303,13 @@ tableEntry * ASTNode_Comparison::Interpret(symbolTable & table)
   return out_var;
 }
 
+// ASTNode_BoolCast
 
 ASTNode_BoolCast::ASTNode_BoolCast(ASTNode * in)
   : ASTNode(Type::NUMBER)
 {
   children.push_back(in);
 }
-
 
 tableEntry * ASTNode_BoolCast::Interpret(symbolTable & table)
 {
@@ -338,12 +327,13 @@ tableEntry * ASTNode_BoolCast::Interpret(symbolTable & table)
   return out_var;
 }
 
+// ASTNode_Bool1
+
 ASTNode_Bool1::ASTNode_Bool1(ASTNode * in, int op)
   : ASTNode(Type::BOOL), bool_op(op)
 {
   children.push_back(in);
 }
-
 
 tableEntry * ASTNode_Bool1::Interpret(symbolTable & table)
 {
@@ -360,7 +350,6 @@ tableEntry * ASTNode_Bool1::Interpret(symbolTable & table)
   return out_var;
 }
 
-/////////////////////
 // ASTNode_Bool2
 
 ASTNode_Bool2::ASTNode_Bool2(ASTNode * in1, ASTNode * in2, int op)
@@ -405,8 +394,6 @@ tableEntry * ASTNode_Bool2::Interpret(symbolTable & table)
   return out_var;
 }
 
-
-/////////////////////
 // ASTNode_If
 
 ASTNode_If::ASTNode_If(ASTNode * in1, ASTNode * in2, ASTNode * in3)
@@ -416,7 +403,6 @@ ASTNode_If::ASTNode_If(ASTNode * in1, ASTNode * in2, ASTNode * in3)
   children.push_back(in2);
   children.push_back(in3);
 }
-
 
 tableEntry * ASTNode_If::Interpret(symbolTable & table)
 {
@@ -434,8 +420,6 @@ tableEntry * ASTNode_If::Interpret(symbolTable & table)
   return NULL;
 }
 
-
-/////////////////////
 // ASTNode_While
 
 ASTNode_While::ASTNode_While(ASTNode * in1, ASTNode * in2)
@@ -444,7 +428,6 @@ ASTNode_While::ASTNode_While(ASTNode * in1, ASTNode * in2)
   children.push_back(in1);
   children.push_back(in2);
 }
-
 
 tableEntry * ASTNode_While::Interpret(symbolTable & table)
 {
@@ -459,6 +442,8 @@ tableEntry * ASTNode_While::Interpret(symbolTable & table)
   return NULL;
 }
 
+// ASTNode_For
+
 ASTNode_For::ASTNode_For(ASTNode * in1, ASTNode * in2, ASTNode * in3,
     ASTNode * in4) : ASTNode(Type::VOID)
 {
@@ -467,7 +452,6 @@ ASTNode_For::ASTNode_For(ASTNode * in1, ASTNode * in2, ASTNode * in3,
   children.push_back(in3);
   children.push_back(in4);
 }
-
 
 tableEntry * ASTNode_For::Interpret(symbolTable & table)
 {
@@ -488,6 +472,8 @@ tableEntry * ASTNode_For::Interpret(symbolTable & table)
   return NULL;
 }
 
+// ASTNode_ForIn
+
 ASTNode_ForIn::ASTNode_ForIn(ASTNode * in1, ASTNode * in2, ASTNode * in3)
   : ASTNode(Type::VOID)
 {
@@ -495,7 +481,6 @@ ASTNode_ForIn::ASTNode_ForIn(ASTNode * in1, ASTNode * in2, ASTNode * in3)
   children.push_back(in2);
   children.push_back(in3);
 }
-
 
 tableEntry * ASTNode_ForIn::Interpret(symbolTable & table)
 {
@@ -526,8 +511,6 @@ tableEntry * ASTNode_ForIn::Interpret(symbolTable & table)
   return NULL;
 }
 
-
-/////////////////////
 // ASTNode_Break
 
 ASTNode_Break::ASTNode_Break()
@@ -535,23 +518,20 @@ ASTNode_Break::ASTNode_Break()
 {
 }
 
-
 tableEntry * ASTNode_Break::Interpret(symbolTable & table)
 {
   return NULL;
 }
 
-
-/////////////////////
 // ASTNode_Print
 
 ASTNode_Print::ASTNode_Print(ASTNode * out_child)
   : ASTNode(Type::VOID)
 {
-  // Save the child...
-  if (out_child != NULL) AddChild(out_child);
+  if (out_child) {
+    AddChild(out_child);
+  }
 }
-
 
 tableEntry * ASTNode_Print::Interpret(symbolTable & table)
 {
@@ -567,12 +547,13 @@ tableEntry * ASTNode_Print::Interpret(symbolTable & table)
   return NULL;
 }
 
+// ASTNode_StringCast
+
 ASTNode_StringCast::ASTNode_StringCast(ASTNode * in)
   : ASTNode(Type::STRING)
 {
   children.push_back(in);
 }
-
 
 tableEntry * ASTNode_StringCast::Interpret(symbolTable & table)
 {

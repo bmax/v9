@@ -6,10 +6,8 @@
 namespace Type {
   enum TypeNames { VOID=0, NUMBER, BOOL, STRING, OBJECT, ARRAY, REFERENCE };
 
-  std::string AsString(int type); // Convert the internal type to a string like "int"
-
-  // Write addtional Type helper methods here, such as bool IsArray(int type) or
-  // int InnerType(int type)  to identify what type is inside an array.
+  // Convert the internal type to a string like "int"
+  std::string AsString(int type);
 };
 
 #endif
