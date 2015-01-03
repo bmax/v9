@@ -38,4 +38,4 @@ type_info.o: type_info.h type_info.cc
 # Cleanup all auto-generated files
 
 clean:
-	rm -f v9 *.o v9-lexer.cc *.tab.cc *.tab.hh *~
+	rm -f v9 *.o v9-lexer.cc *.tab.cc *.tab.hh *.output *~
