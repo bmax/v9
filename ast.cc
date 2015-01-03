@@ -27,9 +27,6 @@ tableEntry * ASTNode_Block::Interpret(symbolTable & table)
 {
   for (int i = 0; i < GetNumChildren(); i++) {
     tableEntry * current = GetChild(i)->Interpret(table);
-    if (current != NULL && current->GetTemp() == true) {
-      table.RemoveEntry( current );
-    }
   }
 
   return NULL;
@@ -92,7 +89,7 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
       }
     }
   }
-  else if(GetType() == Type::OBJECT) {
+  else if(GetType() == Type::ARRAY) {
     out_var->InitializeArray();
   }
 
@@ -114,25 +111,50 @@ tableEntry * ASTNode_Property::Interpret(symbolTable & table)
   ASTNode * cast = new ASTNode_StringCast(GetChild(1));
   std::string sindex = cast->Interpret(table)->GetStringValue();
 
-  if(assignment) {
-    tableEntry * prop = table.AddTempEntry(Type::VOID);
-    obj->SetProperty(sindex, prop);
-    return prop;
-  }
-  else {
-    tableEntry * prop = obj->GetProperty(sindex);
-    if(prop) {
-      SetType(prop->GetType());
+  if(obj->GetType() == Type::OBJECT) {
+    if(assignment) {
+      tableEntry * prop = table.AddTempEntry(Type::VOID);
+      obj->SetProperty(sindex, prop);
       return prop;
     }
     else {
-      std::string error = "object ";
-      error += obj->GetName();
-      error += " does not have property";
-      error += sindex;
-      yyerror(error);
+      tableEntry * prop = obj->GetProperty(sindex);
+      if(prop) {
+        SetType(prop->GetType());
+        return prop;
+      }
+      else {
+        std::string error = "object ";
+        error += obj->GetName();
+        error += " does not have property";
+        error += sindex;
+        yyerror(error);
+      }
     }
   }
+  else if(obj->GetType() == Type::ARRAY) {
+    unsigned int idx = atoi(sindex.c_str());
+    if(assignment) {
+      tableEntry * val = table.AddTempEntry(Type::VOID);
+      obj->SetIndex(idx, val);
+      return val;
+    }
+    else {
+      tableEntry * val = obj->GetIndex(idx);
+      if(val) {
+        SetType(val->GetType());
+        return val;
+      }
+      else {
+        std::string error = "array ";
+        error += obj->GetName();
+        error += " does not have index";
+        error += sindex;
+        yyerror(error);
+      }
+    }
+  }
+
 }
 
 
@@ -166,6 +188,10 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
     left->SetReference(right);
     left->SetType(Type::REFERENCE);
   }
+  else if(left->GetType() == Type::ARRAY) {
+    left->SetReference(right);
+    left->SetType(Type::REFERENCE);
+  }
 
   return left;
 }
@@ -190,8 +216,6 @@ tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
       out_var->SetNumberValue(-in->GetNumberValue());
       break;
   }
-
-  if (in->GetTemp() == true) table.RemoveEntry( in );
 
   return out_var;
 }
@@ -378,10 +402,6 @@ tableEntry * ASTNode_Bool2::Interpret(symbolTable & table)
     out_var->SetBoolValue(in1->GetBoolValue() || in2->GetBoolValue());
   }
 
-  // Cleanup symbol table.
-  if (in1->GetTemp() == true) table.RemoveEntry( in1 );
-  if (in2->GetTemp() == true) table.RemoveEntry( in2 );
-
   return out_var;
 }
 
@@ -404,13 +424,11 @@ tableEntry * ASTNode_If::Interpret(symbolTable & table)
   if(in0->GetBoolValue()) {
     if (GetChild(1)) {
       tableEntry * in1 = GetChild(1)->Interpret(table);
-      if (in1 && in1->GetTemp() == true) table.RemoveEntry( in1 );
     }
   }
   else {
     if (GetChild(2)) {
       tableEntry * in2 = GetChild(2)->Interpret(table);
-      if (in2 && in2->GetTemp() == true) table.RemoveEntry( in2 );
     }
   }
   return NULL;
@@ -435,7 +453,6 @@ tableEntry * ASTNode_While::Interpret(symbolTable & table)
   while(cast->Interpret(table)->GetBoolValue()) {
     if (GetChild(1)) {
       tableEntry * in1 = GetChild(1)->Interpret(table);
-      if (in1 && in1->GetTemp() == true) table.RemoveEntry( in1 );
     }
   }
 
