@@ -547,6 +547,22 @@ tableEntry * ASTNode_Print::Interpret(symbolTable & table)
   return NULL;
 }
 
+// ASTNode_Delete
+
+ASTNode_Delete::ASTNode_Delete(ASTNode * var)
+  : ASTNode(Type::VOID)
+{
+  AddChild(var);
+}
+
+tableEntry * ASTNode_Delete::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+  table.RemoveEntry(in_var);
+
+  return NULL;
+}
+
 // ASTNode_StringCast
 
 ASTNode_StringCast::ASTNode_StringCast(ASTNode * in)

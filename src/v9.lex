@@ -28,6 +28,7 @@ passthrough [+\-*/%=(),!{}[\].;:]
 "for"      { return COMMAND_FOR; }
 "in"       { return COMMAND_IN; }
 "break"    { return COMMAND_BREAK; }
+"delete"   { return COMMAND_DELETE; }
 "true"     { return TRUE; }
 "false"    { return FALSE; }
 "console"  { return CONSOLE; }

@@ -213,6 +213,15 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Deletes a variable and frees memory
+class ASTNode_Delete : public ASTNode {
+public:
+  ASTNode_Delete(ASTNode * var);
+  virtual ~ASTNode_Delete() {;}
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 // Casts a variable into a string value
 class ASTNode_StringCast : public ASTNode {
 public:
