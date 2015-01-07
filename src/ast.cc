@@ -598,3 +598,21 @@ tableEntry * ASTNode_StringCast::Interpret(symbolTable & table)
 
   return out_var;
 }
+
+// ASTNode_TypeOf
+
+ASTNode_TypeOf::ASTNode_TypeOf(ASTNode * in)
+  : ASTNode(Type::STRING)
+{
+  children.push_back(in);
+}
+
+tableEntry * ASTNode_TypeOf::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+  std::string type = Type::AsString(in_var->GetType());
+
+  ASTNode * out_var = new ASTNode_Literal(Type::STRING, type);
+
+  return out_var->Interpret(table);
+}

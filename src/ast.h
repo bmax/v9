@@ -231,4 +231,13 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Returns the type of a variable as a string
+class ASTNode_TypeOf : public ASTNode {
+public:
+  ASTNode_TypeOf(ASTNode * in);
+  virtual ~ASTNode_TypeOf() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 #endif
