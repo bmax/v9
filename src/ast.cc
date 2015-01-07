@@ -203,12 +203,12 @@ ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op)
 
 tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
 {
-  tableEntry * in = GetChild(0)->Interpret(table);
+  tableEntry * in_var = GetChild(0)->Interpret(table);
   tableEntry * out_var = table.AddTempEntry(Type::NUMBER);
 
   switch (math_op) {
     case '-':
-      out_var->SetNumberValue(-in->GetNumberValue());
+      out_var->SetNumberValue(-in_var->GetNumberValue());
       break;
   }
 
@@ -319,11 +319,16 @@ ASTNode_BoolCast::ASTNode_BoolCast(ASTNode * in)
 tableEntry * ASTNode_BoolCast::Interpret(symbolTable & table)
 {
   tableEntry * in_var = GetChild(0)->Interpret(table);
+  tableEntry * out_var = table.AddTempEntry(Type::BOOL);
+
+  if(!in_var) {
+    out_var->SetBoolValue(false);
+    return out_var;
+  }
+
   if(in_var->GetType() == Type::BOOL) {
     return in_var;
   }
-
-  tableEntry * out_var = table.AddTempEntry(Type::BOOL);
 
   if(in_var->GetType() == Type::NUMBER) {
     out_var->SetBoolValue(in_var->GetNumberValue() != 0);
@@ -579,11 +584,16 @@ ASTNode_StringCast::ASTNode_StringCast(ASTNode * in)
 tableEntry * ASTNode_StringCast::Interpret(symbolTable & table)
 {
   tableEntry * in_var = GetChild(0)->Interpret(table);
+  tableEntry * out_var = table.AddTempEntry(Type::STRING);
+
+  if(!in_var) {
+    out_var->SetStringValue("undefined");
+    return out_var;
+  }
+
   if(in_var->GetType() == Type::STRING) {
     return in_var;
   }
-
-  tableEntry * out_var = table.AddTempEntry(Type::STRING);
 
   std::stringstream ss;
 
@@ -618,7 +628,14 @@ ASTNode_TypeOf::ASTNode_TypeOf(ASTNode * in)
 tableEntry * ASTNode_TypeOf::Interpret(symbolTable & table)
 {
   tableEntry * in_var = GetChild(0)->Interpret(table);
-  std::string type = Type::AsString(in_var->GetType());
+
+  std::string type;
+  if(in_var) {
+    type = Type::AsString(in_var->GetType());
+  }
+  else {
+    type = "undefined";
+  }
 
   ASTNode * out_var = new ASTNode_Literal(Type::STRING, type);
 
