@@ -593,6 +593,9 @@ tableEntry * ASTNode_StringCast::Interpret(symbolTable & table)
       ss << "false";
     }
   }
+  else if(in_var->GetType() == Type::NLL) {
+    ss << "null";
+  }
 
   out_var->SetStringValue(ss.str());
 

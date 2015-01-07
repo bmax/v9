@@ -31,6 +31,7 @@ passthrough [+\-*/%=(),!{}[\].;:]
 "delete"   { return COMMAND_DELETE; }
 "true"     { return TRUE; }
 "false"    { return FALSE; }
+"null"     { return NLL; }
 "console"  { return CONSOLE; }
 "log"      { return LOG; }
 "Boolean"  { return BOOLEAN; }

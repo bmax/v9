@@ -10,6 +10,7 @@ namespace Type {
       case OBJECT: return "object";
       case ARRAY: return "array";
       case REFERENCE: return "reference";
+      case NLL: return "null";
     }
     return "unknown";
   }

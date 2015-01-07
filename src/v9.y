@@ -35,7 +35,7 @@ void yyerror2(std::string err_string, int orig_line) {
   ASTNode * ast_node;
 }
  
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE CONSOLE LOG BOOLEAN TO_STRING TYPEOF COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE NLL CONSOLE LOG BOOLEAN TO_STRING TYPEOF COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
 %token <lexeme> NUMBER_LIT STRING_LIT ID VAR
  
 %right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
@@ -255,6 +255,10 @@ expression:  expression '+' expression {
                // Strip off outside quotes
                lit = lit.substr(1, lit.length() - 2);
                $$ = new ASTNode_Literal(Type::STRING, lit);
+               $$->SetLineNum(line_num);
+             }
+        |    NLL {
+               $$ = new ASTNode_Literal(Type::NLL);
                $$->SetLineNum(line_num);
              }
         |    '{' '}' {
