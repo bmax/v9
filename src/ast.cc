@@ -165,6 +165,11 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
   tableEntry * left = GetChild(0)->Interpret(table);
   tableEntry * right = GetChild(1)->Interpret(table);
 
+  // Right expression is undefined, don't perform any assignment
+  if(!right) {
+    return NULL;
+  }
+
   left->SetType(right->GetType());
 
   if(left->GetType() == Type::NUMBER) {
@@ -618,4 +623,19 @@ tableEntry * ASTNode_TypeOf::Interpret(symbolTable & table)
   ASTNode * out_var = new ASTNode_Literal(Type::STRING, type);
 
   return out_var->Interpret(table);
+}
+
+// ASTNode_Void
+
+ASTNode_Void::ASTNode_Void(ASTNode * in)
+  : ASTNode(Type::VOID)
+{
+  children.push_back(in);
+}
+
+tableEntry * ASTNode_Void::Interpret(symbolTable & table)
+{
+  GetChild(0)->Interpret(table);
+
+  return NULL;
 }

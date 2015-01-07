@@ -240,4 +240,13 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Evaluates the expression and returns undefined
+class ASTNode_Void : public ASTNode {
+public:
+  ASTNode_Void(ASTNode * in);
+  virtual ~ASTNode_Void() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 #endif

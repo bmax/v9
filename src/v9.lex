@@ -37,6 +37,7 @@ passthrough [+\-*/%=(),!{}[\].;:]
 "Boolean"  { return BOOLEAN; }
 "toString" { return TO_STRING; }
 "typeof"   { return TYPEOF; }
+"void"     { return VOID; }
  
 "var"         { yylval.lexeme = strdup(yytext);  return VAR; }
 {id}          { yylval.lexeme = strdup(yytext);  return ID; }

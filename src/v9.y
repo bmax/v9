@@ -35,10 +35,11 @@ void yyerror2(std::string err_string, int orig_line) {
   ASTNode * ast_node;
 }
  
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE NLL CONSOLE LOG BOOLEAN TO_STRING TYPEOF COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE NLL CONSOLE LOG BOOLEAN TO_STRING TYPEOF VOID COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
 %token <lexeme> NUMBER_LIT STRING_LIT ID VAR
  
 %right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
+%right TYPEOF VOID
 %left BOOL_OR
 %left BOOL_AND
 %nonassoc COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE
@@ -293,11 +294,14 @@ expression:  expression '+' expression {
                $$ = new ASTNode_StringCast($1);
                $$->SetLineNum(line_num);
             }
-        |    TYPEOF var_usage {
+        |    TYPEOF expression {
                $$ = new ASTNode_TypeOf($2);
                $$->SetLineNum(line_num);
             }
-        ;
+        |    VOID expression {
+               $$ = new ASTNode_Void($2);
+               $$->SetLineNum(line_num);
+            }
  
 argument_list:  argument_list ',' expression {
                   ASTNode * node = $1; // Grab the node used for arg list.
