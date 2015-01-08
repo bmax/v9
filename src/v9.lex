@@ -64,12 +64,14 @@ passthrough [+\-*/%=(),!{}[\].;:~&\|^]
 ">>>" { return ZF_RSHIFT; }
 ">>>=" { return CASSIGN_ZF_RSHIFT; }
 
-"==" { return COMP_EQU; }
-"!=" { return COMP_NEQU; }
-"<"  { return COMP_LESS; }
-"<=" { return COMP_LTE; }
-">"  { return COMP_GTR; }
-">=" { return COMP_GTE; }
+"=="  { return COMP_EQU; }
+"!="  { return COMP_NEQU; }
+"<"   { return COMP_LESS; }
+"<="  { return COMP_LTE; }
+">"   { return COMP_GTR; }
+">="  { return COMP_GTE; }
+"===" { return COMP_SEQU; }
+"!==" { return COMP_SNEQU; }
  
 "&&" { return BOOL_AND; }
 "||" { return BOOL_OR; }

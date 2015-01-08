@@ -281,29 +281,69 @@ ASTNode_Comparison::ASTNode_Comparison(ASTNode * in1, ASTNode * in2, int op)
   children.push_back(in2);
 }
 
+bool strict_equality(tableEntry * a, tableEntry * b) {
+  if(a->GetType() != b->GetType()) {
+    return false;
+  }
+
+  else if(a->GetType() == Type::NUMBER) {
+    if(isnan(a->GetNumberValue()) || isnan(b->GetNumberValue())) {
+      return false;
+    }
+
+    return a->GetNumberValue() == b->GetNumberValue();
+  }
+
+  else if(a->GetType() == Type::STRING) {
+    return a->GetNumberValue() == b->GetNumberValue();
+  }
+
+  else if(a->GetType() == Type::BOOL) {
+    return a->GetBoolValue() == b->GetBoolValue();
+  }
+
+  else {
+    return a == b;
+  }
+}
 
 tableEntry * ASTNode_Comparison::Interpret(symbolTable & table)
 {
   tableEntry * in1 = GetChild(0)->Interpret(table);
   tableEntry * in2 = GetChild(1)->Interpret(table);
-  tableEntry * out_var;
+  tableEntry * out_var = table.AddTempEntry(Type::BOOL);
 
-  if(in1->GetType() == Type::NUMBER && in2->GetType() == Type::NUMBER) {
-    out_var = table.AddTempEntry(Type::BOOL);
-    float in1_val = in1->GetNumberValue();
-    float in2_val = in2->GetNumberValue();
-
-    bool value;
-
-    if (comp_op == COMP_EQU) { value = (in1_val == in2_val); }
-    else if (comp_op == COMP_NEQU) { value = (in1_val != in2_val); }
-    else if (comp_op == COMP_GTR) { value = (in1_val > in2_val); }
-    else if (comp_op == COMP_GTE) { value = (in1_val >= in2_val); }
-    else if (comp_op == COMP_LESS) { value = (in1_val < in2_val); }
-    else if (comp_op == COMP_LTE) { value = (in1_val <= in2_val); }
-
-    out_var->SetBoolValue(value);
+  bool value;
+  switch(comp_op) {
+    case COMP_EQU:
+      value = strict_equality(in1, in2);
+      break;
+    case COMP_NEQU:
+      value = !strict_equality(in1, in2);
+      break;
+    case COMP_GTR:
+      if(in1->GetType() == Type::NUMBER && in2->GetType() == Type::NUMBER) {
+        value = (in1->GetNumberValue() > in2->GetNumberValue());
+      }
+      break;
+    case COMP_GTE:
+      if(in1->GetType() == Type::NUMBER && in2->GetType() == Type::NUMBER) {
+        value = (in1->GetNumberValue() >= in2->GetNumberValue());
+      }
+      break;
+    case COMP_LESS:
+      if(in1->GetType() == Type::NUMBER && in2->GetType() == Type::NUMBER) {
+        value = (in1->GetNumberValue() < in2->GetNumberValue());
+      }
+      break;
+    case COMP_LTE:
+      if(in1->GetType() == Type::NUMBER && in2->GetType() == Type::NUMBER) {
+        value = (in1->GetNumberValue() <= in2->GetNumberValue());
+      }
+      break;
   }
+
+  out_var->SetBoolValue(value);
 
   return out_var;
 }
