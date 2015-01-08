@@ -18,7 +18,7 @@ number_lit  [0-9]+\.[0-9]*|\.[0-9]+|[0-9]+
 string_lit  '(\\.|[^\\']+)*'|\"(\\.|[^\\"]+)*\"
 comment     \/\/.*
 whitespace  [ \t\r]
-passthrough [+\-*/%=(),!{}[\].;:]
+passthrough [+\-*/%=(),!{}[\].;:~&\|^]
  
 %%
  
@@ -52,7 +52,18 @@ passthrough [+\-*/%=(),!{}[\].;:]
 "%=" { return CASSIGN_MOD; }
 "++" { return INCREMENT; }
 "--" { return DECREMENT; }
+
+"&=" { return CASSIGN_BITWISE_AND; }
+"|=" { return CASSIGN_BITWISE_OR; }
+"^=" { return CASSIGN_BITWISE_XOR; }
  
+"<<" { return LSHIFT; }
+">>" { return RSHIFT; }
+"<<=" { return CASSIGN_LSHIFT; }
+">>=" { return CASSIGN_RSHIFT; }
+">>>" { return ZF_RSHIFT; }
+">>>=" { return CASSIGN_ZF_RSHIFT; }
+
 "==" { return COMP_EQU; }
 "!=" { return COMP_NEQU; }
 "<"  { return COMP_LESS; }

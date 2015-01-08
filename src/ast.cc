@@ -404,6 +404,77 @@ tableEntry * ASTNode_Bool2::Interpret(symbolTable & table)
   return out_var;
 }
 
+// ASTNode_Bitwise1
+
+ASTNode_Bitwise1::ASTNode_Bitwise1(ASTNode * in, int op)
+  : ASTNode(Type::NUMBER), bitwise_op(op)
+{
+  children.push_back(in);
+}
+
+tableEntry * ASTNode_Bitwise1::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+
+  int value = in_var->GetNumberValue();
+
+  tableEntry * out_var = table.AddTempEntry(Type::NUMBER);
+
+  switch(bitwise_op) {
+    case '~':
+      value = ~value;
+      break;
+  }
+
+  out_var->SetNumberValue(value);
+  return out_var;
+}
+
+// ASTNode_Bitwise2
+
+ASTNode_Bitwise2::ASTNode_Bitwise2(ASTNode * in1, ASTNode * in2, int op)
+  : ASTNode(Type::NUMBER), bitwise_op(op)
+{
+  children.push_back(in1);
+  children.push_back(in2);
+}
+
+tableEntry * ASTNode_Bitwise2::Interpret(symbolTable & table)
+{
+  tableEntry * in0 = GetChild(0)->Interpret(table);
+  tableEntry * in1 = GetChild(1)->Interpret(table);
+
+  int left = in0->GetNumberValue();
+  int right = in1->GetNumberValue();
+
+  tableEntry * out_var = table.AddTempEntry(Type::NUMBER);
+
+  int value;
+  switch(bitwise_op) {
+    case '&':
+      value = left & right;
+      break;
+    case '|':
+      value = left | right;
+      break;
+    case '^':
+      value = left ^ right;
+      break;
+    case LSHIFT:
+      value = left << right;
+      break;
+    case RSHIFT:
+      value = left >> right;
+      break;
+    case ZF_RSHIFT:
+      value = left >> unsigned(right);
+      break;
+  }
+
+  out_var->SetNumberValue(value);
+  return out_var;
+}
+
 // ASTNode_If
 
 ASTNode_If::ASTNode_If(ASTNode * in1, ASTNode * in2, ASTNode * in3)

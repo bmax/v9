@@ -159,6 +159,28 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// One-input bitwise operations ('~')
+class ASTNode_Bitwise1 : public ASTNode {
+protected:
+  int bitwise_op;
+public:
+  ASTNode_Bitwise1(ASTNode * in, int op);
+  virtual ~ASTNode_Bitwise1() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
+// Two-input bitwise operations ('&', '|', '^', '<<', '>>', '>>>')
+class ASTNode_Bitwise2 : public ASTNode {
+protected:
+  int bitwise_op;
+public:
+  ASTNode_Bitwise2(ASTNode * in1, ASTNode * in2, int op);
+  virtual ~ASTNode_Bitwise2() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 // If-conditional node
 class ASTNode_If : public ASTNode {
 public:

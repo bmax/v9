@@ -35,18 +35,22 @@ void yyerror2(std::string err_string, int orig_line) {
   ASTNode * ast_node;
 }
  
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE NLL CONSOLE LOG BOOLEAN TO_STRING TYPEOF VOID COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT LSHIFT RSHIFT ZF_RSHIFT CASSIGN_BITWISE_AND CASSIGN_BITWISE_OR CASSIGN_BITWISE_XOR CASSIGN_LSHIFT CASSIGN_RSHIFT CASSIGN_ZF_RSHIFT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE BOOL_AND BOOL_OR TRUE FALSE NLL CONSOLE LOG BOOLEAN TO_STRING TYPEOF VOID COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
 %token <lexeme> NUMBER_LIT STRING_LIT ID VAR
  
-%right '=' CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
+%left '.'
+%nonassoc UMINUS '!'
 %right TYPEOF VOID
-%left BOOL_OR
-%left BOOL_AND
 %nonassoc COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE
 %left '+' '-'
 %left '*' '/' '%'
-%nonassoc UMINUS '!'
-%left '.'
+%left LSHIFT RSHIFT ZF_RSHIFT
+%left '&' '|' '^'
+%left BOOL_AND
+%left BOOL_OR
+%right CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
+%right CASSIGN_LSHIFT CASSIGN_RSHIFT CASSIGN_ZF_RSHIFT
+%left ','
  
 %nonassoc NOELSE
 %nonassoc COMMAND_ELSE
@@ -154,11 +158,31 @@ expression:  expression '+' expression {
                $$->SetLineNum(line_num);
              }
         |    expression '/' expression {
-               $$ = new ASTNode_Math2($1, $3, '/');
+               $$ = new ASTNode_Bitwise2($1, $3, '/');
                $$->SetLineNum(line_num);
              }
-        |    expression '%' expression {
-               $$ = new ASTNode_Math2($1, $3, '%');
+        |    expression '&' expression {
+               $$ = new ASTNode_Bitwise2($1, $3, '&');
+               $$->SetLineNum(line_num);
+             }
+        |    expression '|' expression {
+               $$ = new ASTNode_Bitwise2($1, $3, '|');
+               $$->SetLineNum(line_num);
+             }
+        |    expression '^' expression {
+               $$ = new ASTNode_Bitwise2($1, $3, '^');
+               $$->SetLineNum(line_num);
+             }
+        |    expression LSHIFT expression {
+               $$ = new ASTNode_Bitwise2($1, $3, LSHIFT);
+               $$->SetLineNum(line_num);
+             }
+        |    expression RSHIFT expression {
+               $$ = new ASTNode_Bitwise2($1, $3, RSHIFT);
+               $$->SetLineNum(line_num);
+             }
+        |    expression ZF_RSHIFT expression {
+               $$ = new ASTNode_Bitwise2($1, $3, ZF_RSHIFT);
                $$->SetLineNum(line_num);
              }
         |    expression COMP_EQU expression {
@@ -217,6 +241,33 @@ expression:  expression '+' expression {
                $$ = new ASTNode_Assign($1, new ASTNode_Math2($1, $3, '%') );
                $$->SetLineNum(line_num);
              }
+     /*   |    lhs_ok CASSIGN_BITWISE_AND expression {
+               $$ = new ASTNode_Assign($1, new ASTNode_Bitwise2($1, $3, '&'));
+               $$->SetLineNum(line_num);
+             }
+        |    lhs_ok CASSIGN_BITWISE_OR expression {
+               $$ = new ASTNode_Assign($1, new ASTNode_Bitwise2($1, $3, '|') );
+               $$->SetLineNum(line_num);
+             }
+        |    lhs_ok CASSIGN_BITWISE_XOR expression {
+               $$ = new ASTNode_Assign($1, new ASTNode_Bitwise2($1, $3, '^') );
+               $$->SetLineNum(line_num);
+             }
+        |    lhs_ok CASSIGN_LSHIFT expression {
+               ASTNode * op = new ASTNode_Bitwise2($1, $3, LSHIFT);
+               $$ = new ASTNode_Assign($1, op);
+               $$->SetLineNum(line_num);
+             }
+        |    lhs_ok CASSIGN_RSHIFT expression {
+               ASTNode * op = new ASTNode_Bitwise2($1, $3, RSHIFT);
+               $$ = new ASTNode_Assign($1, op);
+               $$->SetLineNum(line_num);
+             }
+        |    lhs_ok CASSIGN_ZF_RSHIFT expression {
+               ASTNode * op = new ASTNode_Bitwise2($1, $3, ZF_RSHIFT);
+               $$ = new ASTNode_Assign($1, op);
+               $$->SetLineNum(line_num);
+             }*/
         |    INCREMENT var_usage {
                ASTNode * one_const = new ASTNode_Literal(Type::NUMBER, "1");
                ASTNode * addition = new ASTNode_Math2($2, one_const, '+');
@@ -235,6 +286,10 @@ expression:  expression '+' expression {
              }
         |    '!' expression %prec UMINUS {
                $$ = new ASTNode_Bool1($2, '!');
+               $$->SetLineNum(line_num);
+             }
+        |    '~' expression %prec UMINUS {
+               $$ = new ASTNode_Bitwise1($2, '~');
                $$->SetLineNum(line_num);
              }
         |    '(' expression ')' { $$ = $2; }
