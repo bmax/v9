@@ -128,15 +128,6 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
-// Casts a variable into a boolean value
-class ASTNode_BoolCast : public ASTNode {
-public:
-  ASTNode_BoolCast(ASTNode * in);
-  virtual ~ASTNode_BoolCast() { ; }
-
-  tableEntry * Interpret(symbolTable & table);
-};
-
 // One-input bool operations ('!')
 class ASTNode_Bool1 : public ASTNode {
 protected:
@@ -240,6 +231,24 @@ class ASTNode_Delete : public ASTNode {
 public:
   ASTNode_Delete(ASTNode * var);
   virtual ~ASTNode_Delete() {;}
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
+// Casts a variable into a number value
+class ASTNode_NumberCast : public ASTNode {
+public:
+  ASTNode_NumberCast(ASTNode * in);
+  virtual ~ASTNode_NumberCast() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
+// Casts a variable into a boolean value
+class ASTNode_BoolCast : public ASTNode {
+public:
+  ASTNode_BoolCast(ASTNode * in);
+  virtual ~ASTNode_BoolCast() { ; }
 
   tableEntry * Interpret(symbolTable & table);
 };

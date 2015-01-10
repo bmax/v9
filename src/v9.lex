@@ -34,7 +34,9 @@ passthrough [+\-*/%=(),!{}[\].;:~&\|^]
 "null"     { return NLL; }
 "console"  { return CONSOLE; }
 "log"      { return LOG; }
+"Number"   { return NUMBER; }
 "Boolean"  { return BOOLEAN; }
+"String"   { return STRING; }
 "toString" { return TO_STRING; }
 "typeof"   { return TYPEOF; }
 "void"     { return VOID; }

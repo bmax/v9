@@ -348,35 +348,6 @@ tableEntry * ASTNode_Comparison::Interpret(symbolTable & table)
   return out_var;
 }
 
-// ASTNode_BoolCast
-
-ASTNode_BoolCast::ASTNode_BoolCast(ASTNode * in)
-  : ASTNode(Type::NUMBER)
-{
-  children.push_back(in);
-}
-
-tableEntry * ASTNode_BoolCast::Interpret(symbolTable & table)
-{
-  tableEntry * in_var = GetChild(0)->Interpret(table);
-  tableEntry * out_var = table.AddTempEntry(Type::BOOL);
-
-  if(!in_var) {
-    out_var->SetBoolValue(false);
-    return out_var;
-  }
-
-  if(in_var->GetType() == Type::BOOL) {
-    return in_var;
-  }
-
-  if(in_var->GetType() == Type::NUMBER) {
-    out_var->SetBoolValue(in_var->GetNumberValue() != 0);
-  }
-
-  return out_var;
-}
-
 // ASTNode_Bool1
 
 ASTNode_Bool1::ASTNode_Bool1(ASTNode * in, int op)
@@ -682,6 +653,72 @@ tableEntry * ASTNode_Delete::Interpret(symbolTable & table)
   table.RemoveEntry(in_var);
 
   return NULL;
+}
+
+// ASTNode_NumberCast
+
+ASTNode_NumberCast::ASTNode_NumberCast(ASTNode * in)
+  : ASTNode(Type::NUMBER)
+{
+  children.push_back(in);
+}
+
+tableEntry * ASTNode_NumberCast::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+  tableEntry * out_var = table.AddTempEntry(Type::NUMBER);
+
+  if(!in_var) {
+    out_var->SetNumberValue(0.0 / 0.0);
+    return out_var;
+  }
+
+  if(in_var->GetType() == Type::NUMBER) {
+    return in_var;
+  }
+
+  if(in_var->GetType() == Type::STRING) {
+    out_var->SetNumberValue(atof(in_var->GetStringValue().c_str()));
+  }
+  else if(in_var->GetType() == Type::BOOL) {
+    if(in_var->GetBoolValue()) {
+      out_var->SetNumberValue(1);
+    }
+    else {
+      out_var->SetNumberValue(0);
+    }
+  }
+
+  return out_var;
+}
+
+// ASTNode_BoolCast
+
+ASTNode_BoolCast::ASTNode_BoolCast(ASTNode * in)
+  : ASTNode(Type::NUMBER)
+{
+  children.push_back(in);
+}
+
+tableEntry * ASTNode_BoolCast::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+  tableEntry * out_var = table.AddTempEntry(Type::BOOL);
+
+  if(!in_var) {
+    out_var->SetBoolValue(false);
+    return out_var;
+  }
+
+  if(in_var->GetType() == Type::BOOL) {
+    return in_var;
+  }
+
+  if(in_var->GetType() == Type::NUMBER) {
+    out_var->SetBoolValue(in_var->GetNumberValue() != 0);
+  }
+
+  return out_var;
 }
 
 // ASTNode_StringCast
