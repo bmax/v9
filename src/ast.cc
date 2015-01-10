@@ -57,7 +57,20 @@ tableEntry * ASTNode_Literal::Interpret(symbolTable & table)
 {
   tableEntry * out_var = table.AddTempEntry(GetType());
   if(GetType() == Type::NUMBER) {
-    out_var->SetNumberValue(atof(lexeme.c_str()));
+    if(lexeme.length() > 1) {
+      if(lexeme[0] == '0' && lexeme[1] == 'x') {
+        out_var->SetNumberValue(strtol(lexeme.c_str(), NULL, 16));
+      }
+      else if(lexeme[0] == '0') {
+        out_var->SetNumberValue(strtol(lexeme.c_str(), NULL, 8));
+      }
+      else {
+        out_var->SetNumberValue(atof(lexeme.c_str()));
+      }
+    }
+    else {
+      out_var->SetNumberValue(atof(lexeme.c_str()));
+    }
   }
   else if(GetType() == Type::BOOL) {
     if(lexeme == "true") {
