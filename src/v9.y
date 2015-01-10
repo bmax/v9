@@ -186,12 +186,20 @@ expression:  expression '+' expression {
                $$ = new ASTNode_Bitwise2($1, $3, ZF_RSHIFT);
                $$->SetLineNum(line_num);
              }
-        |    expression COMP_SEQU expression {
+        |    expression COMP_EQU expression {
                $$ = new ASTNode_Comparison($1, $3, COMP_EQU);
                $$->SetLineNum(line_num);
              }
-        |    expression COMP_SNEQU expression {
+        |    expression COMP_NEQU expression {
                $$ = new ASTNode_Comparison($1, $3, COMP_NEQU);
+               $$->SetLineNum(line_num);
+             }
+        |    expression COMP_SEQU expression {
+               $$ = new ASTNode_Comparison($1, $3, COMP_SEQU);
+               $$->SetLineNum(line_num);
+             }
+        |    expression COMP_SNEQU expression {
+               $$ = new ASTNode_Comparison($1, $3, COMP_SNEQU);
                $$->SetLineNum(line_num);
              }
         |    expression COMP_LESS expression {

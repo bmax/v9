@@ -295,7 +295,7 @@ bool strict_equality(tableEntry * a, tableEntry * b) {
   }
 
   else if(a->GetType() == Type::STRING) {
-    return a->GetNumberValue() == b->GetNumberValue();
+    return a->GetStringValue() == b->GetStringValue();
   }
 
   else if(a->GetType() == Type::BOOL) {
@@ -307,6 +307,42 @@ bool strict_equality(tableEntry * a, tableEntry * b) {
   }
 }
 
+bool abstract_equality(tableEntry * a, tableEntry * b, symbolTable & table) {
+  if(a && b && a->GetType() == b->GetType()) {
+    return strict_equality(a, b);
+  }
+
+  else if(a->GetType() == NLL && !b) {
+    return true;
+  }
+
+  else if(a->GetType() == NLL && !a) {
+    return true;
+  }
+
+  else if(a->GetType() == Type::NUMBER && b->GetType() == Type::STRING) {
+    ASTNode * cast = new ASTNode_NumberCast(new ASTNode_Variable(b));
+    return a->GetNumberValue() == cast->Interpret(table)->GetNumberValue();
+  }
+
+  else if(a->GetType() == Type::STRING && b->GetType() == Type::NUMBER) {
+    ASTNode * cast = new ASTNode_NumberCast(new ASTNode_Variable(b));
+    return cast->Interpret(table)->GetNumberValue() == b->GetNumberValue();
+  }
+
+  else if(a->GetType() == Type::NUMBER && b->GetType() == Type::BOOL) {
+    ASTNode * cast = new ASTNode_NumberCast(new ASTNode_Variable(b));
+    return a->GetNumberValue() == cast->Interpret(table)->GetNumberValue();
+  }
+
+  else if(a->GetType() == Type::BOOL && b->GetType() == Type::NUMBER) {
+    ASTNode * cast = new ASTNode_NumberCast(new ASTNode_Variable(b));
+    return cast->Interpret(table)->GetNumberValue() == b->GetNumberValue();
+  }
+
+  return false;
+}
+
 tableEntry * ASTNode_Comparison::Interpret(symbolTable & table)
 {
   tableEntry * in1 = GetChild(0)->Interpret(table);
@@ -316,9 +352,15 @@ tableEntry * ASTNode_Comparison::Interpret(symbolTable & table)
   bool value;
   switch(comp_op) {
     case COMP_EQU:
-      value = strict_equality(in1, in2);
+      value = abstract_equality(in1, in2, table);
       break;
     case COMP_NEQU:
+      value = !abstract_equality(in1, in2, table);
+      break;
+    case COMP_SEQU:
+      value = strict_equality(in1, in2);
+      break;
+    case COMP_SNEQU:
       value = !strict_equality(in1, in2);
       break;
     case COMP_GTR:
