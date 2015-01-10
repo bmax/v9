@@ -3,41 +3,41 @@
 #include <string>
 #include <fstream>
 #include <stdio.h>
- 
+
 #include "symbol_table.h"
 #include "ast.h"
 #include "type_info.h"
- 
+
 extern int line_num;
 extern int yylex();
- 
+
 symbolTable symbol_table;
 int error_count = 0;
- 
+
 // Create an error function to call when the current line has an error
 void yyerror(std::string err_string) {
   std::cout << "ERROR(line " << line_num << "): "
        << err_string << std::endl;
   error_count++;
 }
- 
+
 // Create an alternate error function when a *different* line than being read in has an error.
 void yyerror2(std::string err_string, int orig_line) {
   std::cout << "ERROR(line " << orig_line << "): "
        << err_string << std::endl;
   error_count++;
 }
- 
+
 %}
- 
+
 %union {
   char * lexeme;
   ASTNode * ast_node;
 }
- 
+
 %token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT LSHIFT RSHIFT ZF_RSHIFT CASSIGN_BITWISE_AND CASSIGN_BITWISE_OR CASSIGN_BITWISE_XOR CASSIGN_LSHIFT CASSIGN_RSHIFT CASSIGN_ZF_RSHIFT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE COMP_SEQU COMP_SNEQU BOOL_AND BOOL_OR TRUE FALSE NLL CONSOLE LOG NUMBER STRING BOOLEAN TO_STRING TYPEOF VOID COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
 %token <lexeme> NUMBER_LIT STRING_LIT ID VAR
- 
+
 %left '.'
 %nonassoc UMINUS '!'
 %right TYPEOF VOID
@@ -52,20 +52,20 @@ void yyerror2(std::string err_string, int orig_line) {
 %right CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
 %right CASSIGN_LSHIFT CASSIGN_RSHIFT CASSIGN_ZF_RSHIFT
 %left ','
- 
+
 %nonassoc NOELSE
 %nonassoc COMMAND_ELSE
- 
+
  
 %type <ast_node> var_declare expression declare_assign statement statement_list var_usage lhs_ok command argument_list property_list code_block if_start while_start for_declare for_start for_in_start flow_command
 %%
- 
+
 program:      statement_list {
                  // Traverse AST
                  $1->Interpret(symbol_table);
               }
              ;
- 
+
 statement_list:         {
                    $$ = new ASTNode_Block;
                  }
@@ -74,7 +74,7 @@ statement_list:         {
                    $$ = $1;
                  }
         ;
- 
+
 statement:   var_declare ';'    {  $$ = $1;  }
         |    declare_assign ';' {  $$ = $1;  }
         |    expression ';'     {  $$ = $1;  }
@@ -83,7 +83,7 @@ statement:   var_declare ';'    {  $$ = $1;  }
         |    code_block         {  $$ = $1;  }
         |    ';'                {  $$ = NULL;  }
         ;
- 
+
 var_declare:        VAR ID {
                   if (symbol_table.InCurScope($2) != 0) {
                     std::string err_string = "redeclaration of variable '";
@@ -92,19 +92,19 @@ var_declare:        VAR ID {
                     yyerror(err_string);
                     exit(1);
                   }
- 
+
                   tableEntry * cur_entry = symbol_table.AddEntry(0, $2);
                   $$ = new ASTNode_Variable(cur_entry);
                   $$->SetLineNum(line_num);
                 }
         ;
- 
+
 declare_assign:  var_declare '=' expression {
                    $$ = new ASTNode_Assign($1, $3);
                    $$->SetLineNum(line_num);
                  }
         ;
- 
+
 var_usage:   ID {
                tableEntry * cur_entry = symbol_table.Lookup($1);
                if (cur_entry == NULL) {
@@ -118,7 +118,7 @@ var_usage:   ID {
                $$->SetLineNum(line_num);
              }
         ;
- 
+
 lhs_ok:  var_usage { $$ = $1; }
       |  var_usage '[' expression ']' {
            $$ = new ASTNode_Property($1, $3, true);
@@ -145,7 +145,7 @@ property_list:  property_list ',' ID ':' expression {
                   $$->SetLineNum(line_num);
                 }
         ;
- 
+
 expression:  expression '+' expression {
                $$ = new ASTNode_Math2($1, $3, '+');
                $$->SetLineNum(line_num);
@@ -374,7 +374,7 @@ expression:  expression '+' expression {
                $$ = new ASTNode_Void($2);
                $$->SetLineNum(line_num);
             }
- 
+
 argument_list:  argument_list ',' expression {
                   ASTNode * node = $1; // Grab the node used for arg list.
                   node->AddChild($3);    // Save this argument in the node.
@@ -387,7 +387,7 @@ argument_list:  argument_list ',' expression {
                   $$->SetLineNum(line_num);
                 }
         ;
- 
+
 command:   CONSOLE '.' LOG '(' argument_list ')' {
              $$ = new ASTNode_Print(NULL);
              $$->TransferChildren($5);
@@ -403,13 +403,13 @@ command:   CONSOLE '.' LOG '(' argument_list ')' {
              $$->SetLineNum(line_num);
            }
         ;
- 
+
 if_start:  COMMAND_IF '(' expression ')' {
              $$ = new ASTNode_If(new ASTNode_BoolCast($3), NULL, NULL);
              $$->SetLineNum(line_num);
            }
         ;
- 
+
 while_start:  COMMAND_WHILE '(' expression ')' {
                 $$ = new ASTNode_While($3, NULL);
                 $$->SetLineNum(line_num);
@@ -454,20 +454,20 @@ flow_command:  if_start statement COMMAND_ELSE statement {
                  $$->SetChild(2, $2);
                }
             ;
- 
+
 block_start: '{' { symbol_table.IncScope(); } ;
 block_end:   '}' { symbol_table.DecScope(); } ;
 code_block:  block_start statement_list block_end { $$ = $2; } ;
- 
+
 %%
 void LexMain(int argc, char * argv[]);
- 
+
 int main(int argc, char * argv[])
 {
   error_count = 0;
   LexMain(argc, argv);
- 
+
   yyparse();
- 
+
   return 0;
 }
