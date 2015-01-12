@@ -51,6 +51,7 @@ void yyerror2(std::string err_string, int orig_line) {
 %left BOOL_OR
 %right CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD
 %right CASSIGN_LSHIFT CASSIGN_RSHIFT CASSIGN_ZF_RSHIFT
+%right CASSIGN_BITWISE_AND CASSIGN_BITWISE_OR CASSIGN_BITWISE_XOR
 %left ','
 
 %nonassoc NOELSE
@@ -250,7 +251,7 @@ expression:  expression '+' expression {
                $$ = new ASTNode_Assign($1, new ASTNode_Math2($1, $3, '%') );
                $$->SetLineNum(line_num);
              }
-     /*   |    lhs_ok CASSIGN_BITWISE_AND expression {
+        |    lhs_ok CASSIGN_BITWISE_AND expression {
                $$ = new ASTNode_Assign($1, new ASTNode_Bitwise2($1, $3, '&'));
                $$->SetLineNum(line_num);
              }
@@ -276,7 +277,7 @@ expression:  expression '+' expression {
                ASTNode * op = new ASTNode_Bitwise2($1, $3, ZF_RSHIFT);
                $$ = new ASTNode_Assign($1, op);
                $$->SetLineNum(line_num);
-             }*/
+             }
         |    INCREMENT var_usage {
                ASTNode * one_const = new ASTNode_Literal(Type::NUMBER, "1");
                ASTNode * addition = new ASTNode_Math2($2, one_const, '+');
