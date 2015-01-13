@@ -99,8 +99,9 @@ public:
 class ASTNode_Math1 : public ASTNode {
 protected:
   int math_op;
+  bool prefix;
 public:
-  ASTNode_Math1(ASTNode * in_child, int op);
+  ASTNode_Math1(ASTNode * in_child, int op, bool pre);
   virtual ~ASTNode_Math1() { ; }
 
   tableEntry * Interpret(symbolTable & table);

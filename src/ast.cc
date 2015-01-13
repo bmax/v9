@@ -208,8 +208,8 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
 
 // ASTNode_Math1
 
-ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op)
-  : ASTNode(Type::NUMBER), math_op(op)
+ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op, bool pre = true)
+  : ASTNode(Type::NUMBER), math_op(op), prefix(pre)
 {
   children.push_back(in_child);
 }
@@ -222,6 +222,26 @@ tableEntry * ASTNode_Math1::Interpret(symbolTable & table)
   switch (math_op) {
     case '-':
       out_var->SetNumberValue(-in_var->GetNumberValue());
+      break;
+    case INCREMENT:
+      if(prefix) {
+        in_var->SetNumberValue(in_var->GetNumberValue() + 1);
+        out_var->SetNumberValue(in_var->GetNumberValue());
+      }
+      else {
+        out_var->SetNumberValue(in_var->GetNumberValue());
+        in_var->SetNumberValue(in_var->GetNumberValue() + 1);
+      }
+      break;
+    case DECREMENT:
+      if(prefix) {
+        in_var->SetNumberValue(in_var->GetNumberValue() - 1);
+        out_var->SetNumberValue(in_var->GetNumberValue());
+      }
+      else {
+        out_var->SetNumberValue(in_var->GetNumberValue());
+        in_var->SetNumberValue(in_var->GetNumberValue() - 1);
+      }
       break;
   }
 

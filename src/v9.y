@@ -279,15 +279,19 @@ expression:  expression '+' expression {
                $$->SetLineNum(line_num);
              }
         |    INCREMENT var_usage {
-               ASTNode * one_const = new ASTNode_Literal(Type::NUMBER, "1");
-               ASTNode * addition = new ASTNode_Math2($2, one_const, '+');
-               $$ = new ASTNode_Assign($2, addition);
+               $$ = new ASTNode_Math1($2, INCREMENT, true);
                $$->SetLineNum(line_num);
              }
         |    DECREMENT var_usage {
-               ASTNode * one_const = new ASTNode_Literal(Type::NUMBER, "1");
-               ASTNode * subtraction = new ASTNode_Math2($2, one_const, '-');
-               $$ = new ASTNode_Assign($2, subtraction);
+               $$ = new ASTNode_Math1($2, DECREMENT, true);
+               $$->SetLineNum(line_num);
+             }
+        |    var_usage INCREMENT {
+               $$ = new ASTNode_Math1($1, INCREMENT, false);
+               $$->SetLineNum(line_num);
+             }
+        |    var_usage DECREMENT {
+               $$ = new ASTNode_Math1($1, DECREMENT, false);
                $$->SetLineNum(line_num);
              }
         |    '-' expression %prec UMINUS {
