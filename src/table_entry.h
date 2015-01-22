@@ -67,6 +67,7 @@ public:
     }
   }
   std::map<std::string, tableEntry*>  * GetPropertyMap() const { return o; }
+  std::map<unsigned int, tableEntry*>  * GetArray() const { return a; }
   tableEntry * GetIndex(unsigned int pos) {
     if(a->find(pos) == a->end()) {
       return NULL;

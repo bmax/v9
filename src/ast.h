@@ -101,7 +101,7 @@ protected:
   int math_op;
   bool prefix;
 public:
-  ASTNode_Math1(ASTNode * in_child, int op, bool pre);
+  ASTNode_Math1(ASTNode * in_child, int op, bool pre = true);
   virtual ~ASTNode_Math1() { ; }
 
   tableEntry * Interpret(symbolTable & table);
@@ -277,6 +277,15 @@ class ASTNode_Void : public ASTNode {
 public:
   ASTNode_Void(ASTNode * in);
   virtual ~ASTNode_Void() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
+// Join array elements into a string
+class ASTNode_Join : public ASTNode {
+public:
+  ASTNode_Join(ASTNode * in, ASTNode * sep);
+  virtual ~ASTNode_Join() { ; }
 
   tableEntry * Interpret(symbolTable & table);
 };

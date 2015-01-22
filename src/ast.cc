@@ -208,7 +208,7 @@ tableEntry * ASTNode_Assign::Interpret(symbolTable & table)
 
 // ASTNode_Math1
 
-ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op, bool pre = true)
+ASTNode_Math1::ASTNode_Math1(ASTNode * in_child, int op, bool pre)
   : ASTNode(Type::NUMBER), math_op(op), prefix(pre)
 {
   children.push_back(in_child);
@@ -878,4 +878,37 @@ tableEntry * ASTNode_Void::Interpret(symbolTable & table)
   GetChild(0)->Interpret(table);
 
   return NULL;
+}
+
+// ASTNode_Join
+
+ASTNode_Join::ASTNode_Join(ASTNode * in, ASTNode * sep)
+  : ASTNode(Type::STRING)
+{
+  children.push_back(in);
+  children.push_back(sep);
+}
+
+tableEntry * ASTNode_Join::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+  tableEntry * seperator = GetChild(1)->Interpret(table);
+
+  std::string join_str = "";
+
+  std::map<unsigned int, tableEntry*> * pm = in_var->GetArray();
+  for (std::map<unsigned int, tableEntry*>::iterator i = pm->begin();
+       i != pm->end(); i++) {
+    ASTNode * var = new ASTNode_Variable(i->second);
+    ASTNode * cast = new ASTNode_StringCast(var);
+    tableEntry * string_val = cast->Interpret(table);
+    join_str += string_val->GetStringValue();
+    std::map<unsigned int, tableEntry*>::iterator end = pm->end();
+    if(i != --end) {
+      join_str += seperator->GetStringValue();
+    }
+  }
+
+  ASTNode * out_var = new ASTNode_Literal(Type::STRING, join_str);
+  return out_var->Interpret(table);
 }

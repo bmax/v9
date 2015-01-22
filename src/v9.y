@@ -35,7 +35,7 @@ void yyerror2(std::string err_string, int orig_line) {
   ASTNode * ast_node;
 }
 
-%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT LSHIFT RSHIFT ZF_RSHIFT CASSIGN_BITWISE_AND CASSIGN_BITWISE_OR CASSIGN_BITWISE_XOR CASSIGN_LSHIFT CASSIGN_RSHIFT CASSIGN_ZF_RSHIFT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE COMP_SEQU COMP_SNEQU BOOL_AND BOOL_OR TRUE FALSE NLL CONSOLE LOG NUMBER STRING BOOLEAN TO_STRING TYPEOF VOID COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
+%token CASSIGN_ADD CASSIGN_SUB CASSIGN_MULT CASSIGN_DIV CASSIGN_MOD INCREMENT DECREMENT LSHIFT RSHIFT ZF_RSHIFT CASSIGN_BITWISE_AND CASSIGN_BITWISE_OR CASSIGN_BITWISE_XOR CASSIGN_LSHIFT CASSIGN_RSHIFT CASSIGN_ZF_RSHIFT COMP_EQU COMP_NEQU COMP_LESS COMP_LTE COMP_GTR COMP_GTE COMP_SEQU COMP_SNEQU BOOL_AND BOOL_OR TRUE FALSE NLL CONSOLE LOG NUMBER STRING BOOLEAN TO_STRING TYPEOF VOID JOIN COMMAND_IF COMMAND_ELSE COMMAND_WHILE COMMAND_FOR COMMAND_IN COMMAND_BREAK COMMAND_DELETE
 %token <lexeme> NUMBER_LIT STRING_LIT ID VAR
 
 %left '.'
@@ -57,7 +57,6 @@ void yyerror2(std::string err_string, int orig_line) {
 %nonassoc NOELSE
 %nonassoc COMMAND_ELSE
 
- 
 %type <ast_node> var_declare expression declare_assign statement statement_list var_usage lhs_ok command argument_list property_list code_block if_start while_start for_declare for_start for_in_start flow_command
 %%
 
@@ -379,6 +378,14 @@ expression:  expression '+' expression {
                $$ = new ASTNode_Void($2);
                $$->SetLineNum(line_num);
             }
+        |    var_usage '.' JOIN '(' ')' {
+               ASTNode * comma = new ASTNode_Literal(Type::STRING, ",");
+               $$ = new ASTNode_Join($1, comma);
+            }
+        |    var_usage '.' JOIN '(' expression ')' {
+               $$ = new ASTNode_Join($1, $5);
+            }
+        ;
 
 argument_list:  argument_list ',' expression {
                   ASTNode * node = $1; // Grab the node used for arg list.
