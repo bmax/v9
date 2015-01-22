@@ -43,6 +43,7 @@ passthrough [+\-*/%=(),!{}[\].;:~&\|^]
 "typeof"   { return TYPEOF; }
 "void"     { return VOID; }
 "join"     { return JOIN; }
+"push"     { return PUSH; }
 
 "var"         { yylval.lexeme = strdup(yytext);  return VAR; }
 {id}          { yylval.lexeme = strdup(yytext);  return ID; }

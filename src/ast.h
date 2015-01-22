@@ -290,4 +290,13 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Adds an element to the end of the array
+class ASTNode_Push : public ASTNode {
+public:
+  ASTNode_Push(ASTNode * in, ASTNode * elem);
+  virtual ~ASTNode_Push() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 #endif

@@ -912,3 +912,25 @@ tableEntry * ASTNode_Join::Interpret(symbolTable & table)
   ASTNode * out_var = new ASTNode_Literal(Type::STRING, join_str);
   return out_var->Interpret(table);
 }
+
+// ASTNode_Push
+
+ASTNode_Push::ASTNode_Push(ASTNode * in, ASTNode * elem)
+  : ASTNode(Type::VOID)
+{
+  children.push_back(in);
+  children.push_back(elem);
+}
+
+tableEntry * ASTNode_Push::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+  tableEntry * element = GetChild(1)->Interpret(table);
+
+  std::map<unsigned int, tableEntry*>::iterator end = in_var->GetArray()->end();
+  unsigned int last_index = end->first;
+
+  in_var->SetIndex(last_index++, element);
+
+  return NULL;
+}
