@@ -299,4 +299,13 @@ public:
   tableEntry * Interpret(symbolTable & table);
 };
 
+// Removes last element of the array
+class ASTNode_Pop : public ASTNode {
+public:
+  ASTNode_Pop(ASTNode * in);
+  virtual ~ASTNode_Pop() { ; }
+
+  tableEntry * Interpret(symbolTable & table);
+};
+
 #endif

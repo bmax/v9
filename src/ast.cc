@@ -934,3 +934,28 @@ tableEntry * ASTNode_Push::Interpret(symbolTable & table)
 
   return NULL;
 }
+
+// ASTNode_Pop
+
+ASTNode_Pop::ASTNode_Pop(ASTNode * in)
+  : ASTNode(Type::VOID)
+{
+  children.push_back(in);
+}
+
+tableEntry * ASTNode_Pop::Interpret(symbolTable & table)
+{
+  tableEntry * in_var = GetChild(0)->Interpret(table);
+
+  if(in_var->GetArray()->empty()) {
+    return NULL;
+  }
+
+  std::map<unsigned int, tableEntry*>::iterator end = in_var->GetArray()->end();
+  end--;
+  tableEntry * last_elem = end->second;
+
+  in_var->GetArray()->erase(end);
+
+  return last_elem;
+}

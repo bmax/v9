@@ -44,6 +44,7 @@ passthrough [+\-*/%=(),!{}[\].;:~&\|^]
 "void"     { return VOID; }
 "join"     { return JOIN; }
 "push"     { return PUSH; }
+"pop"      { return POP; }
 
 "var"         { yylval.lexeme = strdup(yytext);  return VAR; }
 {id}          { yylval.lexeme = strdup(yytext);  return ID; }
