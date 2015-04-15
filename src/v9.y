@@ -63,6 +63,8 @@ void yyerror2(std::string err_string, int orig_line) {
 program:      statement_list {
                  // Traverse AST
                  $1->Interpret(symbol_table);
+
+                 delete $1;
               }
              ;
 

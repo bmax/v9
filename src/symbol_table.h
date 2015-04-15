@@ -4,22 +4,31 @@
 #include "type_info.h"
 #include "table_entry.h"
 
+#include <list>
+
 // Interacted with by the rest of the code to look up information about variables
 class symbolTable {
 private:
   std::map<std::string, tableEntry *> tbl_map;          // A map of active variables
   std::vector<std::vector<tableEntry *> *> scope_info;  // Variables declared in each scope
   std::vector<tableEntry *> var_archive;                // Variables that are out of scope
+  std::list<tableEntry *> temp_list;                    // List of temporary table entries
   int cur_scope;                                        // Current scope level
 
 public:
-  symbolTable() : cur_scope(0) { 
+  symbolTable() : cur_scope(0) {
     scope_info.push_back(new std::vector<tableEntry *>);
   }
   ~symbolTable() {
     // Clean up all variable entries
     while (cur_scope >= 0) DecScope();
     for (int i = 0; i < (int) var_archive.size(); i++) delete var_archive[i];
+
+    // Clean up temporary entries
+    for (std::list<tableEntry *>::iterator it = temp_list.begin();
+         it != temp_list.end(); it++) {
+      delete *it;
+    }
   }
 
   int GetSize() const { return (int) tbl_map.size(); }
@@ -91,13 +100,11 @@ public:
   // Insert a temp variable entry into the symbol table.
   tableEntry * AddTempEntry(int in_type) {
     tableEntry * new_entry = new tableEntry(in_type);
+    temp_list.push_back(new_entry);
     return new_entry;
   }
 
-  void FreeTempVarID(int id) { (void) id; /* Nothing for now... */ }
-
   void RemoveEntry(tableEntry * del_var) {
-    // We no longer nead this entry...
     delete del_var;
   }
 };
