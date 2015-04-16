@@ -161,7 +161,7 @@ expression:  expression '+' expression {
                $$->SetLineNum(line_num);
              }
         |    expression '/' expression {
-               $$ = new ASTNode_Bitwise2($1, $3, '/');
+               $$ = new ASTNode_Math2($1, $3, '/');
                $$->SetLineNum(line_num);
              }
         |    expression '&' expression {
